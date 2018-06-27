@@ -1,0 +1,146 @@
+
+
+
+
+
+
+   
+
+
+see_it_allasset_xplor_locations:
+    path:     /1   
+    defaults: { _controller: SeeItAllassetXploreBundle:App:locations }    
+
+see_it_allasset_xplor_buildings:
+    path:     /1/{building_id}     
+    defaults: { _controller: SeeItAllassetXploreBundle:App:buildings } 
+    requirements: 
+        building_id:    \d+   # a digit of any length will match this route
+           
+
+see_it_allasset_xplor_rooms:
+    path:      /1/{building_id}/{room_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:rooms } 
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+
+       
+
+see_it_allasset_xplor_items:
+    path:      /1/{building_id}/{room_id}/{item_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:items }
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+
+        item_id:    \d+    
+
+
+
+
+#REMOVE ASSETS ROUTES
+
+see_it_allasset_xplor_remove_buildings:
+    path:     /remove/1/{building_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removebuilding }
+    requirements: 
+        building_id:    \d+    
+
+see_it_allasset_xplor_remove_rooms:
+    path:     /remove/1/{building_id}/{room_id}     
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removeroom }  
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+  
+  
+see_it_allasset_xplor_remove_items:
+    path:     /remove/1/{building_id}/{room_id}/{item_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removeitem}    
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+
+        item_id:    \d+
+
+
+
+
+#DOCS ROUTES
+
+see_it_allasset_xplor_buildings_docs:
+    path:     /docs/{building_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:docbuildings }
+    requirements: 
+        building_id:    \d+    
+
+see_it_allasset_xplor_rooms_docs:
+    path:     /docs/{building_id}/{room_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:docrooms } 
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+   
+
+see_it_allasset_xplor_items_docs:
+    path:     /docs/{building_id}/{room_id}/{item_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:docitems } 
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+
+        item_id:    \d+
+        
+
+ #REMOVE DOCS ROUTES
+
+
+
+see_it_allasset_xplor_remove_buildings_docs:
+    path:     /remove/docs/1/{document_id}/{building_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:RemovebuildingPdf }
+    requirements: 
+        document_id:   \d+
+        building_id:    \d+    
+
+see_it_allasset_xplor_remove_rooms_docs:
+    path:     /remove/docs/1/{document_id}/{building_id}/{room_id}     
+    defaults: { _controller: SeeItAllassetXploreBundle:App:RemoveroomPdf }  
+    requirements: 
+        document_id:   \d+
+        building_id:    \d+
+        room_id:    \d+  
+  
+see_it_allasset_xplor_remove_items_docs:
+    path:     /remove/docs/1/{document_id}/{building_id}/{room_id}/{item_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:RemoveitemPdf}    
+    requirements: 
+        document_id:   \d+
+        building_id:    \d+
+        room_id:    \d+
+        item_id:    \d+
+
+
+
+#JSON data_loc ROUTES
+
+see_it_allasset_xplor_level0_grid:
+    path:     /grid/{building_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Loclevel_0 }
+    requirements: 
+        building_id:    \d+  
+
+
+see_it_allasset_xplor_rooms_grid:
+    path:      /grid/{building_id}/{room_id}     
+    defaults: { _controller: SeeItAllassetXploreBundle:App:gridrooms}  
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+  
+
+
+see_it_allasset_xplor_items_grid:
+    path:      /grid/{building_id}/{room_id}/{item_id}       
+    defaults: { _controller: SeeItAllassetXploreBundle:App:griditems}  
+    requirements: 
+        building_id:    \d+
+        room_id:    \d+ 
+
+
+
+

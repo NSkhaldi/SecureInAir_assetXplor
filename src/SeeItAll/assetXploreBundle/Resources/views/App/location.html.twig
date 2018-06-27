@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>AssetXplor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+
+<body>
+  <main role="main" id="root" >
+    <!-- Sidebar -->
+    <button type="button" class="sidebar-button" id="sidebar-button" aria-label="Toggle sidebar"></button>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-menu">
+      
+        <a href="{{ path('see_it_allasset_xplor_locations') }}" class="sidebar-menu-item on" alt="Location">Level 1
+         
+        </a>
+        <a href="#" class="sidebar-menu-item  " alt="Building">Level 2
+        <span class="badge">{{ buildings_number }}</span>
+        </a>
+        <a href="#" class="sidebar-menu-item" alt="Room">Level 3</a>
+        <a href="#" class="sidebar-menu-item" alt="Object">Level 4</a>
+      </div>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-footer-item overview" alt="Overview">Overview</a>
+        <a href="#" class="sidebar-footer-item settings" alt="Settings">Settings</a>  
+        <a href="#" class="sidebar-footer-item help" alt="Help">Help</a>
+        <div class="sidebar-footer-copy">&copy; 2018 AssetXplor ver. 0.0.1</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+
+      <div class="body-header">
+        <form class="body-header-name" method="GET" action="/app.html">
+          <input type="text" name="location-name" value="Location Name" maxlength="50" required class="input" />
+          <button type="submit" aria-label="Save" class="button">Save</button>
+        </form>
+        <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images"> Building</button>
+        <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>
+        
+      </div>
+
+      <div class="body-notes">Note: We work with one location</div>
+
+
+      <div class="body-url">
+        <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
+        <button type="button" class="button body-url-copy" id="button-copy-url" aria-label="Copy URL" data-clipboard-target="#body-url">Copy URL</button>
+        <button type="button" class="button body-url-qr" id="button-qr" aria-label="Get QR-code" data-target="#body-url">Get QR-code</button>
+      </div>
+
+      <div class="image-map-container">
+        <div id="main-image" class="main-image" data-pdf="http://www.assetxplor.nl/app/Symfony/web/">
+                  <div class="main-image-inner">
+            <img src="{{ asset('assets/tmp/aerial_rail.JPG') }}" />
+            <button type="button" class="main-image-button more" aria-label="More"></button>
+          </div>
+        </div>
+
+      <!-- Body > Main Map -->
+        <div class="main-map">
+          <div id="main-map-container" class="main-map-container">
+            <img src="{{asset('assets/tmp/background  rail.JPG') }}" />
+          </div>
+          <label class="radio" for="floor1">
+            <input type="radio" id="floor1" name="floor" checked /> Floor 1
+            <div class="radio-mark"></div>
+          </label>
+          <label class="radio" for="floor2">
+            <input type="radio" id="floor2" name="floor" /> Floor 2
+            <div class="radio-mark"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Body > Frame Images -->
+      <div class="body-image-list" id="image-list">
+
+         {% for building in buildings %}
+
+        <div class="image-item" 
+         data-image="{{ asset(building.getBuildingImage) }}"
+         data-name="{{ building.getBuildingName }}"
+         data-remove="{{ path('see_it_allasset_xplor_remove_buildings', {'building_id': building.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_buildings_docs', {'building_id': building.getId }) }}"
+         data-pin={{ building.getDataLoc }}>
+          <div class="image-item-image">
+
+            <img src="{{asset(building.getBuildingImage) }}" alt="Building 1" />
+            <a href="{{ path('see_it_allasset_xplor_buildings', {'building_id': building.getId }) }}" class="image-item-button enter" title="Navigate to the next level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+
+          </div>
+
+          <div class="image-item-label">
+            {{ building.getBuildingName }}
+            <span class="badge location">1</span>
+            <span class="badge building">{{ building.getIdasset}}</span> 
+          </div>
+        </div>
+
+
+
+          {% endfor %}
+    </div>
+    <!--- End of the body -->
+
+    <!-- Editor -->
+    <div class="editor-container" id="editor-container">
+      <div class="editor-toolbar" id="editor-toolbar">
+        <input class="editor-name" id="editor-name" type="text" value="" />
+        <div class="editor-button-set">
+          <button class="editor-button undo" id="undoaction" title="Undo" aria-label="Undo"></button>
+          <button class="editor-button redo" id="redoaction" title="Redo" aria-label="Redo"></button>
+        </div>
+        <div class="editor-button-set">
+          <button class="editor-button rectangle" name="tool" data-tool="rectangle" title="Rectangle" checked />
+          <button class="editor-button circle" class="editor-button circle" name="tool" data-tool="circle" title="Circle" />
+          <button class="editor-button text" class="editor-button text" name="tool" data-tool="text" title="Text" />
+          <button class="editor-button arrow" class="editor-button arrow" name="tool" data-tool="arrow" title="Arrow" />
+          <button class="editor-button pen" class="editor-button pen" name="tool" data-tool="pen" title="Pen" />
+        </div>
+        <button class="editor-button cancel" aria-label="Cancel" id="editor-cancel">Cancel</button>
+        <button class="editor-button save" aria-label="Save" id="editor-save">Save</button>
+      </div>
+      <div id="editor-image" class="editor-image"></div>
+    </div>
+
+
+
+
+
+    <!-- Add images popup -->
+    <div class="add-images-container" id="add-images-container">
+      
+      {{ form_start(form, {'attr' : {'class' :'add-images-form'}}) }}
+        <h1>Add Images</h1>
+        {{ form_widget(form.file) }}
+        <label for="add-images-input-note">Note
+          {{ form_widget(form.note, { 'attr': {'placeholder': 'Enter note', 'maxlength': '50', 'name': 'note', 'id' : 'add-image-input-note', 'value' : '-' } }) }}
+        </label>
+        <label for="add-images-input-site-id">Asset ID
+          {{ form_widget(form.id_asset, { 'attr': {'placeholder': 'Enter site ID', 'maxlength': '50', 'name': 'asset_id', 'id' : 'add-image-input-site-id', 'value' : '-' } }) }}
+        </label>
+        <label for="add-images-input-location-number">Contract number
+          {{ form_widget(form.contract_number, { 'attr': {'placeholder': 'Enter contract number', 'maxlength': '50', 'name': 'location-number', 'id' : 'add-image-input-location-number','value' : '-' } }) }}
+            
+        </label>
+        <div class="button-group">
+          <button type="button" id="add-images-cancel" class="button">Cancel</button>
+          {{ form_widget(form.save,  { 'attr': {'class' : 'button-blue'} })  }}
+          {{ form_end(form) }}
+        </div>
+      </form>
+    </div>
+
+    <!-- Save image popup -->
+    <div class="add-images-container" id="save-image-container">
+      {{ form_start(form_saveImage, {'attr' : {'class' :'add-images-form'}}) }}
+        <h1>Save Image</h1>
+        <img class="add-images-image" id="save-image-tag" />
+         
+         <input type="hidden" id="save-image-input-image" name="save-image-input-image" value="" /> 
+        <label for="save-image-input-note">Note
+          {{ form_widget(form_saveImage.note, { 'attr': {'placeholder': 'Enter note', 'maxlength': '50', 'name': 'note', 'id' : 'save-image-input-note', 'value' : '' } }) }}
+        </label>
+        <label for="save-image-input-site-id">Asset ID
+          {{ form_widget(form_saveImage.asset_id, { 'attr': {'placeholder': 'Enter site ID', 'maxlength': '50', 'name': 'asset_id', 'id' : 'save-image-input-site-id', 'value' : '-' } }) }}
+        </label>
+        <label for="save-image-input-location-number">Contract number
+          {{ form_widget(form_saveImage.contract_number, { 'attr': {'placeholder': 'Enter contract number', 'maxlength': '50', 'name': 'location-number', 'id' : 'save-image-input-location-number','value' : '-' } }) }}
+        </label>
+        <div class="button-group">
+           <button type="button" id="save-image-cancel" class="button">Cancel</button>
+          {{ form_widget(form_saveImage.save, { 'attr': {'class': 'button-blue' } }) }}
+          {{ form_end(form_saveImage) }}
+        </div>
+      </form>
+    </div>
+
+
+                <!-- Pin Editor popup -->
+    <div class="pin-editor" id="pin-editor">
+      <form class="pin-editor-form" method="GET"  >
+        <h1 id="pin-editor-header">Pin Editor</h1>
+        <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
+        
+        <div class="pin-editor-container" id="pin-editor-container">
+          <div class="map-pin" id="pin-editor-pin"></div>
+          <img class="pin-editor-image" src="{{asset('assets/tmp/background  rail.JPG') }}" />
+        </div>
+        <div class="button-group">
+        
+          <button type="button" id="pin-editor-cancel" class="button">Cancel</button>
+          <button   type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+
+
+  </main>
+
+
+  <noscript>
+    <h3 style="text-align: center; margin: 40px;">To use AssetXplor, please enable JavaScript.</h3>
+  </noscript>
+<!-- htese files are imported from the web directory       camera.bundle.js      instascan.min.js  qrcode.bundle.js   vendors~editor.bundle.js  vendors~qrcode.bundle.js  !-->
+
+
+<script src="{{ asset('bundles/seeitallassetxplore/js/app.bundle.js') }}" ></script>
+<script src="{{asset('bundles/seeitallassetxplore/js/editor.bundle.js') }}"></script>
+<script src="{{ asset('bundles/seeitallassetxplore/js/vendors~editor.bundle.js') }}"></script>
+<script src="{{ asset('bundles/seeitallassetxplore/js/qrcode.bundle.js') }}"></script>
+<script src="{{ asset('bundles/seeitallassetxplore/js/vendors~qrcode.bundle.js') }}"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+
+
+{% block body %}
+
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>ImageXplor Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+
+<body>
+  <main role="main"  >
+    <form class="form" id="form" method="POST" action="{{ path('fos_user_security_check') }}">
+      <h1 class="form-logo">
+        ImageXplor
+      </h1>
+
+     {# S'il y a une erreur, on l'affiche dans un joli cadre #}
+  {% if error %}
+    <div class="alert alert-danger">{{ error.message }}</div>
+  {% endif %}
+      <h2>Login</h2>
+      <input placeholder="Enter email" name="_username" type="text"  required />
+      <input placeholder="Enter password" type="password" name="_password" required />
+      <button type="submit" class="button-blue">Login</button>
+      <a href="restore-password.html">Restore Password</a>
+      <div class="form-footer">
+        &copy; 2018 ImageXplor ver. 0.0.1
+        <a href="http://seeitall.nl/" class="form-seeitall" target="_blank">
+          Powered by
+          <b>See IT All</b>
+        </a>
+      </div>
+    </form>
+    <main></main>
+    <noscript>
+      <h3 style="text-align: center; margin: 40px;">To use ImageXplor, please enable JavaScript.</h3>
+    </noscript>
+
+                 <script src="{{ asset('bundles/seeitallassetxplore/js/login.bundle.js') }}"></script>
+   
+
+
+
+    
+</body>
+
+{% endblock %}

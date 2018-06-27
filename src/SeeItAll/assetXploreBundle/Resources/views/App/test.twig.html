@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>AssetXplor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+
+<body>
+  <main role="main" id="root" style="display: none;">
+    <!-- Sidebar -->
+    <button type="button" class="sidebar-button" id="sidebar-button" aria-label="Toggle sidebar"></button>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-menu">
+        <a href="#" class="sidebar-menu-item on" alt="Location">Location
+          <span class="badge">27</span>
+        </a>
+        <a href="#" class="sidebar-menu-item" alt="Building">Building</a>
+        <a href="#" class="sidebar-menu-item" alt="Room">Room</a>
+        <a href="#" class="sidebar-menu-item" alt="Object">Object</a>
+      </div>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-footer-item overview" alt="Overview">Overview</a>
+        <a href="#" class="sidebar-footer-item settings" alt="Settings">Settings</a>
+        <a href="#" class="sidebar-footer-item help" alt="Help">Help</a>
+        <div class="sidebar-footer-copy">&copy; 2018 AssetXplor ver. 0.0.1</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+
+      <div class="body-header">
+        <form class="body-header-name" method="GET" action="/app.html">
+          <input type="text" name="location-name" value="Location Name" maxlength="50" required class="input" />
+          <button type="submit" aria-label="Save" class="button">Save</button>
+        </form>
+        <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images">Add Images</button>
+        <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>
+      </div>
+
+      <div class="body-notes">Note: Techinical buildings, 9 buildings</div>
+
+      <div class="body-url">
+        <input readonly type="text" id="body-url" value="http://www.imageviewer.nl/start.php?location=KmVXuinAuM" />
+        <button type="button" class="button body-url-copy" id="button-copy-url" aria-label="Copy URL" data-clipboard-target="#body-url">Copy URL</button>
+        <button type="button" class="button body-url-qr" id="button-qr" aria-label="Get QR-code" data-target="#body-url">Get QR-code</button>
+      </div>
+
+      <div class="maps">
+        <div class="maps-first">
+          <img src="assets/tmp/map.jpg" />
+        </div>
+        <div class="maps-second">
+          <img src="assets/tmp/map-scheme.jpg" />
+          <label class="radio" for="floor1">
+            <input type="radio" id="floor1" name="floor" checked /> Floor 1
+            <div class="radio-mark"></div>
+          </label>
+          <label class="radio" for="floor2">
+            <input type="radio" id="floor2" name="floor" /> Floor 2
+            <div class="radio-mark"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Body > Frame Images -->
+      <div class="body-image-list" id="image-list">
+
+        <div class="image-item" data-image="assets/tmp/image-large.jpg" data-name="Building 1" data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+          <div class="image-item-image">
+            <img src="assets/tmp/image1.jpg" alt="Building 1" />
+            <a href="#" class="image-item-button enter" title="Navigate to the level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+          </div>
+          <div class="image-item-label">
+            Building 1
+            <span class="badge location">1</span>
+            <span class="badge building">7</span>
+            <span class="badge object">28</span>
+          </div>
+        </div>
+    </div>
+    <!--- End of the body -->
+
+    <!-- Editor -->
+    <div class="editor-container" id="editor-container">
+      <div class="editor-toolbar" id="editor-toolbar">
+        <input class="editor-name" id="editor-name" type="text" value="" />
+        <div class="editor-button-set">
+          <button class="editor-button undo" id="undoaction" title="Undo" aria-label="Undo"></button>
+          <button class="editor-button redo" id="redoaction" title="Redo" aria-label="Redo"></button>
+        </div>
+        <div class="editor-button-set">
+          <button class="editor-button rectangle" name="tool" data-tool="rectangle" title="Rectangle" checked />
+          <button class="editor-button circle" class="editor-button circle" name="tool" data-tool="circle" title="Circle" />
+          <button class="editor-button text" class="editor-button text" name="tool" data-tool="text" title="Text" />
+          <button class="editor-button arrow" class="editor-button arrow" name="tool" data-tool="arrow" title="Arrow" />
+          <button class="editor-button pen" class="editor-button pen" name="tool" data-tool="pen" title="Pen" />
+        </div>
+        <button class="editor-button cancel" aria-label="Cancel" id="editor-cancel">Cancel</button>
+        <button class="editor-button save" aria-label="Save" id="editor-save">Save</button>
+      </div>
+      <div id="editor-image" class="editor-image"></div>
+    </div>
+
+    <!-- Add images popup -->
+    <div class="add-images-container" id="add-images-container">
+      <form class="add-images-form" method="GET">
+        <h1>Add Images</h1>
+        <input type="file">
+        <label for="add-images-input-note">Note
+          <input type="text" placeholder="Enter note" maxlength="50" name="note" id="add-images-input-note" value="" />
+        </label>
+        <label for="add-images-input-site-id">Site ID
+          <input type="text" placeholder="Enter site ID" maxlength="50" name="site-id" id="add-images-input-site-id" value="-" />
+        </label>
+        <label for="add-images-input-location-number">Location Number
+          <input type="text" placeholder="Enter location number" maxlength="50" name="location-number" id="add-images-input-location-number"
+            value="-" />
+        </label>
+        <div class="button-group">
+          <button type="button" id="add-images-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Save image popup -->
+    <div class="add-images-container" id="save-image-container">
+      <form class="add-images-form" method="GET">
+        <h1>Save Image</h1>
+        <img class="add-images-image" id="save-image-tag" />
+        <input type="hidden" id="save-image-input-image" name="save-image-input-image" value="" />
+        <label for="save-image-input-note">Note
+          <input type="text" placeholder="Enter note" maxlength="50" name="note" id="save-image-input-note" value="" />
+        </label>
+        <label for="save-image-input-site-id">Site ID
+          <input type="text" placeholder="Enter site ID" maxlength="50" name="site-id" id="save-image-input-site-id" value="-" />
+        </label>
+        <label for="save-image-input-location-number">Location Number
+          <input type="text" placeholder="Enter location number" maxlength="50" name="location-number" id="save-image-input-location-number"
+            value="-" />
+        </label>
+        <div class="button-group">
+          <button type="button" id="save-image-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Grid Editor popup -->
+    <div class="grid-editor" id="grid-editor">
+      <form class="grid-editor-form" method="GET">
+        <h1 id="grid-editor-header">Grid Editor</h1>
+        <input type="hidden" id="grid-editor-input" name="grid-data" value="" />
+        <div class="grid-editor-container" id="grid-editor-container">
+          <div class="grid-editor-container-grid" id="grid-editor-container-grid"></div>
+          <img class="grid-editor-image" src="assets/tmp/map-scheme.jpg" />
+        </div>
+        <div class="button-group">
+          <button type="button" id="grid-editor-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <noscript>
+    <h3 style="text-align: center; margin: 40px;">To use AssetXplor, please enable JavaScript.</h3>
+  </noscript>
+  {% javascripts '@SeeItAllassetXploreBundle/Resources/public/js/app.bundle.js'
+                  '@SeeItAllassetXploreBundle/Resources/public/js/editor.bundle.js'
+                  '@SeeItAllassetXploreBundle/Resources/public/js/vendors~editor.bundle.js'  %}
+    <script src="{{ asset_url }}"></script>
+  {% endjavascripts %}
+</body>
+
+</html>

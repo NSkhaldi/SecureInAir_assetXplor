@@ -1,0 +1,48 @@
+see_it_all_user:
+    resource: "@SeeItAllUserBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+
+
+
+
+
+
+# Here it's like an importation of the routes of the bundle
+see_it_allasset_xplore:
+    resource: "@SeeItAllassetXploreBundle/Resources/config/routing.yml"
+    prefix:   /
+
+
+
+
+
+
+
+
+Assetxplor_homepage:
+    path:     /  #dakhla
+    defaults: { _controller: SeeItAllUserBundle:Security:login  }    #kherja
+
+
+    
+
+fos_user_security:
+    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+
+fos_user_profile:
+    resource: "@FOSUserBundle/Resources/config/routing/profile.xml"
+    prefix: /profile
+
+fos_user_register:
+    resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
+    prefix: /register
+
+fos_user_resetting:
+    resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
+    prefix: /resetting
+
+fos_user_change_password:
+    resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
+    prefix: /profile

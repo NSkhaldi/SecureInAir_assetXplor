@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: 127.0.0.1
+    database_port: null
+    database_name: u19806p26720_axp
+    database_user: u19806p26720_axp
+    database_password: axp.axp
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    secret: 8d024c00a8ef748fbb48e67cc27cacfe118a982b
