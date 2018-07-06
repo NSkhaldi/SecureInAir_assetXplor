@@ -2,7 +2,7 @@
 parameters:
     database_host: 127.0.0.1
     database_port: null
-    database_name: u19806p26720_axp
+    database_name: u19806p26720_axp2  
     database_user: u19806p26720_axp
     database_password: axp.axp
     mailer_transport: smtp

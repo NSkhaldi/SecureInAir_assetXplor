@@ -1,0 +1,99 @@
+{% extends "::assetXplor.html.twig" %}
+
+
+ {% block levels %}
+      <div class="sidebar-menu">
+        <a href="{{ path('see_it_allasset_xplor_level0') }}" class="sidebar-menu-item" alt="Object">Level 0</a>
+        <a href="#" class="sidebar-menu-item on" alt="Level 1">Level 1 <span class="badge"> {{ asset_number }} </span></a>  
+        <a href="#" class="sidebar-menu-item  " alt="level1">Level 2  </a>
+        <a href="#" class="sidebar-menu-item" alt="Room">Level 3 </a>
+        <a href="#" class="sidebar-menu-item" alt="Object">Level 4</a>
+      </div>
+    {% endblock %}
+
+
+{% block body %}
+ <!-- Body -->
+    <div class="body">
+
+      <div class="body-header">
+       <!-- <form class="body-header-name" method="GET" action="/app.html">
+          <input type="text" name="location-name" value="Location Name" maxlength="50" required class="input" />
+          <button type="submit" aria-label="Save" class="button">Save</button>
+        </form> -->
+
+        {{ form_start(name_form, {'attr' : {'class' :'body-header-name'}}) }}
+        {{ form_widget(name_form.level0_name, { 'attr': { 'maxlength': '50', 'name': 'location-name', 'required class' : 'input', 'value' : level0.getLevel0Name } }) }}
+        {{ form_widget(name_form.save, { 'attr': {'class': 'button' } }) }}
+        {{ form_end(name_form) }}
+
+        <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images">Building</button>
+        <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>
+      </div>
+
+      <div class="body-notes">Note: {{level1.getNote}} </div>
+
+
+      <div class="body-url">
+        <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
+        <button type="button" class="button body-url-copy" id="button-copy-url" aria-label="Copy URL" data-clipboard-target="#body-url">Copy URL</button>
+        <button type="button" class="button body-url-qr" id="button-qr" aria-label="Get QR-code" data-target="#body-url">Get QR-code</button>
+      </div>
+
+
+
+
+      <div class="image-map-container">
+        <div id="main-image" class="main-image" data-pdf="{{ path('see_it_allasset_xplor_level0_docs', {'level0_id': level0_id }) }}"> 
+                  <div class="main-image-inner">
+            <img src="{{ asset( level0.getLevel0Image ) }}" />
+            <button type="button" class="main-image-button more" aria-label="More"></button>
+          </div>
+        </div>
+
+      <!-- Body > Main Map -->
+        <div class="main-map">
+          <div id="main-map-container" class="main-map-container">
+            <img src="{{asset('assets/tmp/plattegrond-dap-gebouw.jpg') }}" />
+          </div>
+          <!-- <label class="radio" for="floor1">
+            <input type="radio" id="floor1" name="floor" checked /> Floor 1
+            <div class="radio-mark"></div>
+          </label>
+          <label class="radio" for="floor2">
+            <input type="radio" id="floor2" name="floor" /> Floor 2
+            <div class="radio-mark"></div>
+          </label> -->
+        </div>
+      </div>
+
+      <!-- Body > Frame Images -->
+      <div class="body-image-list" id="image-list">
+
+         {% for level1 in level1_assets %}
+
+        
+          <div class="image-item" 
+         data-image="{{ asset(level1.getLevel1Image) }}"
+         data-name="{{level1.getLevel1Name }}"
+         data-remove="{{ path('see_it_allasset_xplor_remove_level1', {'level0_id': level0.getId , 'level1_id': level1.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_level1_docs',  {'level1_id': level1.getId }) }}" 
+         data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+          <div class="image-item-image">
+
+            <img src="{{asset(level1.getLevel1Image) }}" alt="level1 1" />
+            <a href="{{ path('see_it_allasset_xplor_level2', {'level0_id': level0.getId, 'level1_id': level1.getId   }) }}"  class="image-item-button enter" title="Navigate to the next level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+
+          </div>
+
+          <div class="image-item-label">
+            {{ level1.getlevel1Name }}
+            <span class="badge location">1</span>
+            <span class="badge level1">{{ level1.getIdAsset}}</span> 
+          </div>
+        </div>
+          {% endfor %}
+    </div>
+
+    {% endblock %}
