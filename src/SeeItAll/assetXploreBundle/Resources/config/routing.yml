@@ -100,7 +100,7 @@ see_it_allasset_xplor_level0_docs:
         level1_id:    \d+  
 
 see_it_allasset_xplor_level1_docs:
-    path:     /level1/docs/{level1_id}    
+    path:     /level1/docs/{level0_id}/{level1_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:doclevel1 }
     requirements: 
         level0_id:    \d+
@@ -147,7 +147,7 @@ see_it_allasset_xplor_remove_level0_docs:
         level1_id:    \d+   
 
 see_it_allasset_xplor_remove_level1_docs:
-    path:     /remove/docs/1/{document_id}/{level1_id}    
+    path:     /remove/docs/1/{document_id}/{level0_id}/{level1_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel1Doc }
     requirements: 
         document_id:   \d+
@@ -183,6 +183,34 @@ see_it_allasset_xplor_remove_level4_docs:
         level2_id:    \d+
         level3_id:    \d+
         level4_id:    \d+
+
+
+
+
+#Loc ROUTES
+
+
+see_it_allasset_xplor_level0_map:
+    path:     /level0/map/{level0_id}    
+    defaults: { _controller: SeeItAllassetXploreBundle:App:maplevel0 }
+    requirements: 
+        level1_id:    \d+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

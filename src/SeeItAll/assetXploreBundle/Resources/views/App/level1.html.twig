@@ -46,7 +46,7 @@
       <div class="image-map-container">
         <div id="main-image" class="main-image" data-pdf="{{ path('see_it_allasset_xplor_level0_docs', {'level0_id': level0_id }) }}"> 
                   <div class="main-image-inner">
-            <img src="{{ asset( level0.getLevel0Image ) }}" />
+            <img src="{{ asset( level0.getThumbPath ) }}" />
             <button type="button" class="main-image-button more" aria-label="More"></button>
           </div>
         </div>
@@ -54,7 +54,14 @@
       <!-- Body > Main Map -->
         <div class="main-map">
           <div id="main-map-container" class="main-map-container">
-            <img src="{{asset('assets/tmp/plattegrond-dap-gebouw.jpg') }}" />
+            <div class="main-map-inner">
+            {% if level0.getMapPath is null %}
+                <img src="{{asset('assets/tmp/add_map.png')}}" />
+            {% else %}
+                <img src="{{asset(level0.getMapPath)}}" />
+            {% endif %}
+                <button type="button" class="main-map-button more" aria-label="More"></button>
+            </div>
           </div>
           <!-- <label class="radio" for="floor1">
             <input type="radio" id="floor1" name="floor" checked /> Floor 1
@@ -74,14 +81,15 @@
 
         
           <div class="image-item" 
-         data-image="{{ asset(level1.getLevel1Image) }}"
+         data-image="{{ asset(level1.getImgPath) }}"
          data-name="{{level1.getLevel1Name }}"
-         data-remove="{{ path('see_it_allasset_xplor_remove_level1', {'level0_id': level0.getId , 'level1_id': level1.getId }) }}"
-         data-pdf="{{ path('see_it_allasset_xplor_level1_docs',  {'level1_id': level1.getId }) }}" 
-         data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+         data-remove="{{ path('see_it_allasset_xplor_remove_level1', {'level0_id': level0_id , 'level1_id': level1.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_level1_docs',  {'level0_id': level0_id , 'level1_id': level1.getId }) }}" 
+         data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+         data-panorama="">
           <div class="image-item-image">
 
-            <img src="{{asset(level1.getLevel1Image) }}" alt="level1 1" />
+            <img src="{{asset(level1.getThumbPath) }}" alt="level1 1" />
             <a href="{{ path('see_it_allasset_xplor_level2', {'level0_id': level0.getId, 'level1_id': level1.getId   }) }}"  class="image-item-button enter" title="Navigate to the next level"></a>
             <button type="button" class="image-item-button more" aria-label="More"></button>
 
@@ -96,4 +104,20 @@
           {% endfor %}
     </div>
 
+    {% endblock %}
+
+
+
+    {% block UploadMap %}
+        <!-- Add map popup -->
+    <div class="add-map-container" id="add-map-container">
+    {{ form_start(form_saveMap, {'attr' : {'class' :'add-map-form' }}) }}  
+        <h1>Upload map</h1>   
+        {{ form_widget(form_saveMap.file) }}
+        <div class="button-group">
+            <button type="button" id="add-map-cancel" class="button">Cancel</button>
+            {{ form_widget(form_saveMap.save,  { 'attr': {'class' : 'button-blue'} })  }}
+        </div>
+    {{ form_end(form_saveMap) }}
+    </div>
     {% endblock %}

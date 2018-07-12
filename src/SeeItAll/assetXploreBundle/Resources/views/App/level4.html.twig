@@ -46,7 +46,7 @@
           <div class="image-map-container">
         <div id="main-image" class="main-image" data-pdf="{{ path('see_it_allasset_xplor_level3_docs',  {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3.getId }) }}" >
                   <div class="main-image-inner">
-            <img src="{{ asset( level3.getLevel3Image  ) }}" />
+            <img src="{{ asset( level3.getThumbPath ) }}" />
             <button type="button" class="main-image-button more" aria-label="More"></button>
           </div>
         </div>
@@ -54,7 +54,14 @@
       <!-- Body > Main Map -->
         <div class="main-map">
           <div id="main-map-container" class="main-map-container">
-            <img src="{{asset('assets/tmp/background  rail.JPG') }}" />
+            <div class="main-map-inner">
+            {% if level3.getMapPath is null %}
+                <img src="{{asset('assets/tmp/add_map.png')}}" />
+            {% else %}
+                <img src="{{asset(level3.getMapPath)}}" />
+            {% endif %}
+                <button type="button" class="main-map-button more" aria-label="More"></button>
+            </div>
           </div>
           <!--
           <label class="radio" for="floor1">
@@ -76,14 +83,14 @@
 
         
          <div class="image-item" 
-         data-image="{{ asset(level4.getLevel4Image) }}"
+         data-image="{{ asset(level4.getImgPath) }}"
          data-name="{{ level4.getLevel4Name }}"
          data-remove="{{ path('see_it_allasset_xplor_remove_level4', {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3.getId,'level4_id': level4.getId }) }}"
          data-pdf="{{ path('see_it_allasset_xplor_level4_docs',  {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2_id , 'level3_id': level3.getId,'level4_id': level4.getId }) }}" 
-         data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+         data-panorama="">
           <div class="image-item-image">
 
-            <img src="{{asset(level3.getlevel3Image) }}" alt="level1 2" />
+            <img src="{{asset(level4.getThumbPath) }}" alt="level1 2" />
             <a href="" class="image-item-button enter" title="Navigate to the level"></a>
             <button type="button" class="image-item-button more" aria-label="More"></button>
 
@@ -99,4 +106,20 @@
     </div>
     <!--- End of the body -->
 
+    {% endblock %}
+
+
+
+    {% block UploadMap %}
+        <!-- Add map popup -->
+    <div class="add-map-container" id="add-map-container">
+    {{ form_start(form_saveMap, {'attr' : {'class' :'add-map-form' }}) }}  
+        <h1>Upload map</h1>   
+        {{ form_widget(form_saveMap.file) }}
+        <div class="button-group">
+            <button type="button" id="add-map-cancel" class="button">Cancel</button>
+            {{ form_widget(form_saveMap.save,  { 'attr': {'class' : 'button-blue'} })  }}
+        </div>
+    {{ form_end(form_saveMap) }}
+    </div>
     {% endblock %}

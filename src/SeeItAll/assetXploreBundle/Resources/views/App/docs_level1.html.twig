@@ -3,7 +3,7 @@
 
  {% block levels %}
       <div class="sidebar-menu">
- <a href="{{ path('see_it_allasset_xplor_level0') }}" class="sidebar-menu-item " alt="Location">Back to levels</a>
+ <a href="{{ path('see_it_allasset_xplor_level1', {'level0_id': level0_id, 'level1_id': level1_id}) }}" class="sidebar-menu-item " alt="Location">Back to levels</a>
  <a href="#" class="sidebar-menu-item on " alt="Building">Documents </a>
       </div>
     {% endblock %}
@@ -38,7 +38,7 @@
               <div class="image-map-container">
         <div id="main-image" class="main-image" data-pdf="http://www.assetxplor.nl/app/Symfony/web/">
                   <div class="main-image-inner">
-            <img src="{{ asset( level1.getLevel1Image ) }}" />
+            <img src="{{ asset( level1.getThumbPath ) }}" />
             <button type="button" class="main-image-button more" aria-label="More"></button>
           </div>
         </div>
@@ -56,8 +56,8 @@
         <div class="image-item" 
          data-image='assets/tmp/PDF.JPG'
          data-name="{{ asset('assets/tmp/pdf.jpg') }}"
-         data-remove="{{ path('see_it_allasset_xplor_remove_level0_docs', {   'document_id': doc.getId , 'level0_id': level1.getId }) }}"
-         data-pdf="{{ path('see_it_allasset_xplor_level0_docs', {'level0_id': level1.getId }) }}"
+         data-remove="{{ path('see_it_allasset_xplor_remove_level1_docs', {   'document_id': doc.getId ,'level0_id': level0_id, 'level1_id': level1.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_level1_docs', {'level0_id': level0_id, 'level1_id': level1.getId }) }}"
          >
           <div class="image-item-image">
 
@@ -102,3 +102,5 @@
 
   {% block saveimage %}
   {% endblock %}
+
+

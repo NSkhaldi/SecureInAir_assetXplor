@@ -25,7 +25,7 @@
         <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>  
       </div>
 
-      <div class="body-notes">Note: We work with one location</div>
+      <div class="body-notes"> WELCOME   &nbsp&nbsp&nbsp       to   &nbsp&nbsp&nbsp      <mark><strong>  ASSETXPLOR </strong> </mark> </div>
 
       <div class="body-url">
         <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
@@ -37,7 +37,7 @@
         <div id="main-image" class="main-image" data-pdf="http://www.assetxplor.nl/app/Symfony/web/">
                   <div class="main-image-inner">
             <img src="{{ asset('assets/tmp/netherland.jpg') }}" />
-            <button type="button" class="main-image-button more" aria-label="More"></button>
+           <!-- <button type="button" class="main-image-button more" aria-label="More"></button> -->    
           </div>
         </div>
 
@@ -57,14 +57,15 @@
        {% for level0 in level0_assets %}
 
         <div class="image-item" 
-         data-image="{{ asset(level0.getlevel0Image) }}"
+         data-image="{{ asset(level0.getImgPath) }}"
          data-name="{{ level0.getlevel0Name }}"
          data-remove="{{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}"
          data-pdf="{{ path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId }) }}"
-         data-pin="{{ level0.getDataLoc }}">
+         data-pin="{{ level0.getDataLoc }}"
+         data-panorama="https://storage.googleapis.com/bamdata/panorama/panorama_tunnel_03_07_2018/R0010568.htm">
           <div class="image-item-image">
 
-            <img src="{{asset(level0.getlevel0Image) }}" alt="level0 1" />
+            <img src="{{asset(level0.getThumbPath) }}" alt="level0 1" />
             <a href="{{ path('see_it_allasset_xplor_level1', {'level0_id': level0.getId }) }}" class="image-item-button enter" title="Navigate to the next level"></a>
             <button type="button" class="image-item-button more" aria-label="More"></button>
 

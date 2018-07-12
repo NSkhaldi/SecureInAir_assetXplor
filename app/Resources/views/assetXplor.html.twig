@@ -55,16 +55,19 @@
 
       <div class="image-map-container">
         <div id="main-image" class="main-image" data-pdf="http://www.assetxplor.nl/app/Symfony/web/">
-                  <div class="main-image-inner">
-            <img src="{{ asset('assets/tmp/aerial_rail.JPG') }}" />
-            <button type="button" class="main-image-button more" aria-label="More"></button>
-          </div>
+            <div class="main-image-inner">
+                <img src="{{ asset('assets/tmp/aerial_rail.JPG') }}" />
+                <button type="button" class="main-image-button more" aria-label="More"></button>
+            </div>
         </div>
 
       <!-- Body > Main Map -->
         <div class="main-map">
           <div id="main-map-container" class="main-map-container">
-            <img src="{{asset('assets/tmp/background  rail.JPG') }}" />
+            <div class="main-map-inner">
+              <img src="{{asset('assets/tmp/background  rail.JPG') }}" />
+              <button type="button" class="main-map-button more" aria-label="More"></button>
+            </div>
           </div>
           <label class="radio" for="floor1">
             <input type="radio" id="floor1" name="floor" checked /> Floor 1
@@ -87,7 +90,8 @@
          data-name="{{ building.getBuildingName }}"
          data-remove="{{ path('see_it_allasset_xplor_remove_buildings', {'building_id': building.getId }) }}"
          data-pdf="{{ path('see_it_allasset_xplor_buildings_docs', {'building_id': building.getId }) }}"
-         data-pin={{ building.getDataLoc }}>
+         data-pin={{ building.getDataLoc }}
+         data-panorama="http://www.assetxplor.nl/app/Symfony/web/">
           <div class="image-item-image">
 
             <img src="{{asset(building.getBuildingImage) }}" alt="Building 1" />
@@ -206,6 +210,20 @@
     {% endblock %}
 
 
+    {% block UploadMap %}
+        <!-- Add map popup -->
+    <div class="add-map-container" id="add-map-container">
+      <form class="add-map-form" method="GET">
+        <h1>Upload map</h1>
+        <input type="file">
+        <div class="button-group">
+          <button type="button" id="add-map-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+    {% endblock %}
+
   </main>
 
 
@@ -215,14 +233,17 @@
 <!-- htese files are imported from the web directory       camera.bundle.js      instascan.min.js  qrcode.bundle.js   vendors~editor.bundle.js  vendors~qrcode.bundle.js  !-->
 
 
-  <script src="{{ asset('bundles/seeitallassetxplore/js/app.bundle.js') }}" ></script>
-  <script src="{{asset('bundles/seeitallassetxplore/js/editor.bundle.js') }}"></script>
-  <script src="{{ asset('bundles/seeitallassetxplore/js/vendors~editor.bundle.js') }}"></script>
-  <script src="{{ asset('bundles/seeitallassetxplore/js/qrcode.bundle.js') }}"></script>
-  <script src="{{ asset('bundles/seeitallassetxplore/js/vendors~qrcode.bundle.js') }}"></script>
+  <script  id="app-script" src="{{ asset('js/app.bundle.js') }}" ></script>
+    <script src="{{asset('js/editor.bundle.js') }}"></script>
+  <script src="{{ asset('js/vendors~editor.bundle.js') }}"></script>
+  <script src="{{ asset('js/qrcode.bundle.js') }}"></script>
+  <script src="{{ asset('js/vendors~qrcode.bundle.js') }}"></script>
+
 
 
 
 </body>
 
 </html>
+
+

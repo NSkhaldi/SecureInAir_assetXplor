@@ -1,5 +1,4 @@
-<?php
-                                          
+<?php                                     
                                           
                                 /*  SYMFONY KERNEL CONFIG  */
 

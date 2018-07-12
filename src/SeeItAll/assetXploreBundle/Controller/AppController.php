@@ -14,7 +14,8 @@ use SeeItAll\assetXploreBundle\Entity\Level3;
 use SeeItAll\assetXploreBundle\Entity\Level4;
 
 use SeeItAll\assetXploreBundle\Entity\Document;
-use SeeItAll\assetXploreBundle\Objects\image;
+use SeeItAll\assetXploreBundle\Objects\image; //FOR new edited images
+use SeeItAll\assetXploreBundle\Entity\Map;
 
 
 
@@ -41,6 +42,7 @@ use SeeItAll\assetXploreBundle\Form\Level4NameType;
 
 use SeeItAll\assetXploreBundle\Form\saveImageType;
 use SeeItAll\assetXploreBundle\Form\saveDocType;
+use SeeItAll\assetXploreBundle\Form\saveMapType;
 
 use SeeItAll\assetXploreBundle\Form\Level0LocType;
 use SeeItAll\assetXploreBundle\Form\Level1LocType;
@@ -95,6 +97,7 @@ class AppController extends Controller
       // EMPTY OBJECTS INSTANCIATION
       $level0 = new Level0();
       $image= new image();
+      $map= new Map();
 
 
       // GET THE FORMS
@@ -134,8 +137,11 @@ class AppController extends Controller
 
             $raw_data= $this->get('request_stack')->getCurrentRequest();  //take all the content of the resuest
             $edited_image= $raw_data->get('save-image-input-image');   //extract the raw base64 image data from the hidden input by giving it's name as param
+            
+           // $level0=  saveEditedImage($level0, $edited_image)
 
-            define('UPLOAD_DIR', 'uploads/'); // define the upload path
+            define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+            define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
          
             
           //Here we extract the header from the raw 64base image data
@@ -144,13 +150,19 @@ class AppController extends Controller
 	        $data = base64_decode($img);
             
             $filename=date('Y-m-d H:i:s');
-            $file = UPLOAD_DIR.$filename; // We give the file a unique name (converted timestamp)
-	          $success = file_put_contents($file,  $data); //store the image data in a file
-            print $success ? $file : 'Unable to save the file.';
+            $filename_thumb = date('Y-m-d H:i:s');
+            $file_path = UPLOAD_DIR_STD.$filename;
+            $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+             // We give the file a unique name (converted timestamp)
+	          $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+            print $success ? $file_path : 'Unable to save the file.';
 
             //Level's asset hydration
             $level0->setLevel0Name($filename);
-            $level0->setLevel0Image($file);
+            $level0->setImgPath($file_path);
+            $level0->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+            $level0->setUniqId(); 
+            $level0->setThumbPath($file_thumb_path); //stores the thumnail    
             $level0->setNote($image->getNote());
             $level0->setIdAsset($image->getAssetId());
             $level0->setContractNumber($image->getContractNumber());
@@ -257,6 +269,25 @@ class AppController extends Controller
   }
 
 
+  public function removeLevel1DocAction($document_id, $level0_id, $level1_id,Request $request)
+  {
+    
+    
+    $document =new Document();
+    $em = $this->getDoctrine()->getManager(); 
+   
+    $document= $em->getRepository('SeeItAllassetXploreBundle:document')->find($document_id);
+    if (null === $document) {
+      throw new NotFoundHttpException("the building with the id ".$document_id." do not exist");
+    }
+
+    $em->remove($document);
+    $em->flush();
+    
+    return $this->redirectToRoute('see_it_allasset_xplor_level1_docs',  array('level0_id' => $level0_id,  'level1_id' => $level1_id));
+    
+  }
+
 
   public function loclevel0Action($level0_id,Request $request) {
 
@@ -294,23 +325,32 @@ class AppController extends Controller
     $level0= new Level0();
     $level1 = new Level1();
     $image= new image();
+    
+    
+    
 
     //GET the level1 assets associated with the level0
       $em = $this->getDoctrine()->getManager();
       $level0= $em->getRepository('SeeItAllassetXploreBundle:level0')->find($level0_id);
       $list_level1Assets = $em->getRepository('SeeItAllassetXploreBundle:Level1')->findBy(array('level0' => $level0));
       $level1_assetsNumber = count($list_level1Assets);
+     
 
     // GET THE FORMS
     $form = $this->get('form.factory')->create(level1Type::class, $level1);
     $form_saveImage = $this->get('form.factory')->create(saveImageType::class, $image);
     $form_level0Name = $this->get('form.factory')->create(Level0NameType::class, $level0);
     $form_level1Loc = $this->get('form.factory')->create(Level1LocType::class, $level1);
-    
+    $data= array();
+    $form_saveMap  = $this->createFormBuilder($data)->add('file',   FileType::class)
+                                                    ->add('save',  SubmitType::class) //This form is not attached to a class
+                                                    ->getForm();
+        
 
     $em = $this->getDoctrine()->getManager(); //GET THE ENTITY MANAGER (It's responsible for saving objects to, and fetching objects from, the database.)
     $listlevel1s = $em->getRepository('SeeItAllassetXploreBundle:level1')->findAll(); //GET the REPOSITORY and fetch objects (You can think of a repository as a PHP class whose only job is to help you fetch entities of a certain class.)
     $level1s_number = count($listlevel1s);
+    
     
 
     // BY DEFAULT POST IS THE METHOS USED BY FORMS
@@ -332,8 +372,31 @@ class AppController extends Controller
       }
 
 
+
+      $form_saveMap->handleRequest($request);
+      //FORM 2: adding maps
+      if ($form_saveMap->isSubmitted() &&  $form_saveMap->isValid()) { //CHECK whether this was submitted and whether it is valid 
+            
+        $data = $form_saveMap->getData();
+        $uniqid= uniqid();
+        $data["file"]->move(
+            $level0->getUploadRootDir().$level0->getMapsUploadDir(), // Le répertoire de destination
+            $uniqid // Le nom du fichier à créer, ici « id.extension »
+           );
+
+        $level0->setMapPath($level0->getMapsUploadDir().$uniqid);
+        $em->persist($level0); 
+        $em->flush(); 
+        
+
+        //url redirection (solves reupload when refresh)
+        return $this->redirect($this->generateUrl('see_it_allasset_xplor_level1',  array(
+          'level0_id' => $level0->getId()))); 
+      }
+
+
       
-         //FORM 2: changing the level0's name
+         //FORM 3: changing the level0's name
          $form_level0Name->handleRequest($request);
        
          if ($form_level0Name->isSubmitted() && $form_level0Name->isValid()) {
@@ -347,7 +410,7 @@ class AppController extends Controller
           }
 
 
-      //FORM3 :saving edited image        
+      //FORM4 :saving edited image        
       $form_saveImage->handleRequest($request);
 
        
@@ -357,23 +420,29 @@ class AppController extends Controller
           $raw_data= $this->get('request_stack')->getCurrentRequest();  //take all the content of the resuest
           $edited_image= $raw_data->get('save-image-input-image');   //extract the raw base64 image data from the hidden input by giving it's name as param
 
-          define('UPLOAD_DIR', 'uploads/'); // define the upload path
-
-
-
+          define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+          define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
+       
+          
         //Here we extract the header from the raw 64base image data
-        $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
-        $img = str_replace(' ', '+', $img);
-        $data = base64_decode($img);
+          $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
+          $img = str_replace(' ', '+', $img);
+          $data = base64_decode($img);
           
           $filename=date('Y-m-d H:i:s');
-          $file = UPLOAD_DIR.$filename; // We give the file a unique name (converted timestamp)
-          $success = file_put_contents($file,  $data); //store the image data in a file
-          print $success ? $file : 'Unable to save the file.';
+          $filename_thumb = date('Y-m-d H:i:s');
+          $file_path = UPLOAD_DIR_STD.$filename;
+          $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+           // We give the file a unique name (converted timestamp)
+            $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+          print $success ? $file_path : 'Unable to save the file.';
 
-          //level1 hydration
-          $level1->setlevel1Name($filename);
-          $level1->setlevel1Image($file);
+          //Level's asset hydration
+          $level1->setLevel1Name($filename);
+          $level1->setImgPath($file_path);
+          $level1->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+          $level1->setUniqId(); 
+          $level1->setThumbPath($file_thumb_path); //stores the thumnail    
           $level1->setNote($image->getNote());
           $level1->setIdAsset($image->getAssetId());
           $level1->setContractNumber($image->getContractNumber());
@@ -397,10 +466,11 @@ class AppController extends Controller
     return $this->render('SeeItAllassetXploreBundle:App:level1.html.twig', array(
       'form' => $form->createView(),
       'form_saveImage' => $form_saveImage->createView(),
+      'form_saveMap' => $form_saveMap->createView(),
       'name_form' => $form_level0Name->createView(),
       'form_level1Loc' => $form_level1Loc->createView(),
       'level0_id' => $level0_id, 'level0' => $level0,
-       'level1' => $level1, 'level1_assets' => $list_level1Assets, 'asset_number' => $level1_assetsNumber  ));
+       'level1' => $level1, 'level1_assets' => $list_level1Assets, 'asset_number' => $level1_assetsNumber   ));
   }
 
 
@@ -428,7 +498,7 @@ class AppController extends Controller
     */
 
 
-    public function doclevel1Action($level1_id,Request $request)
+    public function doclevel1Action($level0_id, $level1_id,Request $request)
     {
       
      // EMPTY OBJECTS INSTANCIATION
@@ -457,13 +527,13 @@ class AppController extends Controller
             $em->persist($document);
             $em->flush();
             return $this->redirect($this->generateUrl('see_it_allasset_xplor_level1_docs', array(
-                'level1_id' => $level1->getId())));
+                'level0_id' => $level0_id,  'level1_id' => $level1->getId())));
          }
         }
 
         return $this->render('SeeItAllassetXploreBundle:App:docs_level1.html.twig', array(
             'form_saveDoc' => $form_saveDoc->createView(),
-            'docs' => $listdocuments,'level1' => $level1, 'level1_id' => $level1_id, ));
+            'docs' => $listdocuments,'level1' => $level1, 'level0_id' => $level0_id, 'level1_id' => $level1_id));
 
     }
 
@@ -526,6 +596,11 @@ class AppController extends Controller
       $form_saveImage = $this->get('form.factory')->create(saveImageType::class, $image);
       $form_level1Name = $this->get('form.factory')->create(Level1NameType::class, $level1);
       $form_level2Loc = $this->get('form.factory')->create(Level2LocType::class, $level2);
+      $data= array();
+      $form_saveMap  = $this->createFormBuilder($data)->add('file',   FileType::class)
+                                                      ->add('save',  SubmitType::class) //This form is not attached to a class
+                                                      ->getForm();
+      
      
     
    
@@ -547,7 +622,26 @@ class AppController extends Controller
             'level0_id' => $level0_id ,'level1_id' => $level1->getId())));       
         }
     
-
+        $form_saveMap->handleRequest($request);
+        //FORM 2: adding maps
+        if ($form_saveMap->isSubmitted() &&  $form_saveMap->isValid()) { //CHECK whether this was submitted and whether it is valid 
+              
+          $data = $form_saveMap->getData();
+          $uniqid= uniqid();
+          $data["file"]->move(
+              $level1->getUploadRootDir().$level1->getMapsUploadDir(), // Le répertoire de destination
+              $uniqid // Le nom du fichier à créer, ici « id.extension »
+             );
+  
+          $level1->setMapPath($level1->getMapsUploadDir().$uniqid);
+          $em->persist($level1); 
+          $em->flush(); 
+          
+  
+          //url redirection (solves reupload when refresh)
+          return $this->redirect($this->generateUrl('see_it_allasset_xplor_level2', array(
+            'level0_id' => $level0_id ,'level1_id' => $level1->getId())));  
+        }
         
         //FORM 2: changing the level1's name
         $form_level1Name->handleRequest($request);
@@ -572,29 +666,37 @@ class AppController extends Controller
            $raw_data= $this->get('request_stack')->getCurrentRequest();  //take all the content of the resuest
            $edited_image= $raw_data->get('save-image-input-image');   //extract the raw base64 image data from the hidden input by giving it's name as param
  
-           define('UPLOAD_DIR', 'uploads/'); // define the upload path
+
+           define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+           define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
         
            
          //Here we extract the header from the raw 64base image data
-         $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
-         $img = str_replace(' ', '+', $img);
-         $data = base64_decode($img);
+           $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
+           $img = str_replace(' ', '+', $img);
+           $data = base64_decode($img);
            
            $filename=date('Y-m-d H:i:s');
-           $file = UPLOAD_DIR.$filename; // We give the file a unique name (converted timestamp)
-           $success = file_put_contents($file,  $data); //store the image data in a file
-           print $success ? $file : 'Unable to save the file.';
+           $filename_thumb = date('Y-m-d H:i:s');
+           $file_path = UPLOAD_DIR_STD.$filename;
+           $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+            // We give the file a unique name (converted timestamp)
+             $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+           print $success ? $file_path : 'Unable to save the file.';
  
-           //level2 hydration
-           $level2->setlevel2Name($filename);
-           $level2->setlevel2Image($file);
+           //Level's asset hydration
+           $level2->setLevel2Name($filename);
+           $level2->setImgPath($file_path);
+           $level2->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+           $level2->setUniqId(); 
+           $level2->setThumbPath($file_thumb_path); //stores the thumnail    
            $level2->setNote($image->getNote());
            $level2->setIdAsset($image->getAssetId());
            $level2->setContractNumber($image->getContractNumber());
  
            //storing the image in the db
+           $level2->setLevel1($level1);
            $em = $this->getDoctrine()->getManager();
-           $level2->setlevel1($level1);// link the edited level2 to a level1
            $em->persist($level2); 
            $em->flush();
  
@@ -627,6 +729,7 @@ class AppController extends Controller
       return $this->render('SeeItAllassetXploreBundle:App:level2.html.twig', array(
         'form' => $form->createView(),
         'form_saveImage' => $form_saveImage->createView(),
+        'form_saveMap' => $form_saveMap->createView(),
         'name_form' => $form_level1Name->createView(),
         'form_level2Loc' => $form_level2Loc->createView(),
         'level0_id'=>$level0_id, 'level1_id'=>$level1_id  ,'level1' => $level1, 'level2_assets' => $list_level2Assets,'asset_number' => $level1_assetsNumber ));
@@ -670,24 +773,6 @@ class AppController extends Controller
     }
 
 
-    public function removeBuildingDocAction($document_id, $building_id,Request $request)
-    {
-      
-      
-      $document =new document();
-      $em = $this->getDoctrine()->getManager(); 
-     
-      $document= $em->getRepository('SeeItAllassetXploreBundle:document')->find($document_id);
-      if (null === $document) {
-        throw new NotFoundHttpException("the building with the id ".$document_id." do not exist");
-      }
-
-      $em->remove($document);
-      $em->flush();
-      
-    return $this->redirectToRoute('see_it_allasset_xplor_buildings_docs',  array('building_id' => $building_id));
-      
-    }
 
 
 
@@ -814,6 +899,10 @@ class AppController extends Controller
       $form = $this->get('form.factory')->create(level3Type::class, $level3);
       $form_saveImage = $this->get('form.factory')->create(saveImageType::class, $image);
       $form_level2Name= $this->get('form.factory')->create(level2NameType::class, $level2);
+      $data= array();
+      $form_saveMap  = $this->createFormBuilder($data)->add('file',   FileType::class)
+                                                      ->add('save',  SubmitType::class) //This form is not attached to a class
+                                                      ->getForm();
 
 
       
@@ -854,8 +943,29 @@ class AppController extends Controller
             'level0_id' => $level0_id,'level1_id' => $level1_id, 'level2_id' => $level2_id))); 
          }
 
+         $form_saveMap->handleRequest($request);
+         //FORM 3: adding maps
+         if ($form_saveMap->isSubmitted() &&  $form_saveMap->isValid()) { //CHECK whether this was submitted and whether it is valid 
+               
+           $data = $form_saveMap->getData();
+           $uniqid= uniqid();
+           $data["file"]->move(
+               $level2->getUploadRootDir().$level2->getMapsUploadDir(), // Le répertoire de destination
+               $uniqid // Le nom du fichier à créer, ici « id.extension »
+              );
+   
+           $level2->setMapPath($level2->getMapsUploadDir().$uniqid);
+           $em->persist($level2); 
+           $em->flush(); 
+           
+   
+           //url redirection (solves reupload when refresh)
+           return $this->redirect($this->generateUrl('see_it_allasset_xplor_level3', array(
+            'level0_id' => $level0_id,'level1_id' => $level1_id, 'level2_id' => $level2_id)));   
+         }
+         
 
-         //FORM 3: saving edited level3        
+         //FORM 4: saving edited level3        
          $form_saveImage->handleRequest($request);
 
          //This form doesn't hydrate directly the level3 object( which is totally possible), but instead he fill an image object (Objects/image) 
@@ -864,29 +974,36 @@ class AppController extends Controller
            $raw_data= $this->get('request_stack')->getCurrentRequest();  //take all the content of the resuest
            $edited_image= $raw_data->get('save-image-input-image');   //extract the raw base64 image data from the hidden input by giving it's name as param
  
-           define('UPLOAD_DIR', 'uploads/'); // define the upload path
+           define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+           define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
         
            
          //Here we extract the header from the raw 64base image data
-         $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
-         $img = str_replace(' ', '+', $img);
-         $data = base64_decode($img);
+           $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
+           $img = str_replace(' ', '+', $img);
+           $data = base64_decode($img);
            
            $filename=date('Y-m-d H:i:s');
-           $file = UPLOAD_DIR.$filename; // We give the file a unique name (converted timestamp)
-           $success = file_put_contents($file,  $data); //store the image data in a file
-           print $success ? $file : 'Unable to save the file.';
+           $filename_thumb = date('Y-m-d H:i:s');
+           $file_path = UPLOAD_DIR_STD.$filename;
+           $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+            // We give the file a unique name (converted timestamp)
+             $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+           print $success ? $file_path : 'Unable to save the file.';
  
-           //level3 hydration
-           $level3->setlevel3Name($filename);
-           $level3->setlevel3Image($file);
+           //Level's asset hydration
+           $level3->setLevel3Name($filename);
+           $level3->setImgPath($file_path);
+           $level3->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+           $level3->setUniqId(); 
+           $level3->setThumbPath($file_thumb_path); //stores the thumnail    
            $level3->setNote($image->getNote());
            $level3->setIdAsset($image->getAssetId());
            $level3->setContractNumber($image->getContractNumber());
  
            //storing the image in the db
+           $level3->setLevel2($level2);
            $em = $this->getDoctrine()->getManager();
-           $level3->setlevel2($level2);// link the edited level3 to a level2
            $em->persist($level3); 
            $em->flush();
  
@@ -902,7 +1019,9 @@ class AppController extends Controller
       return $this->render('SeeItAllassetXploreBundle:App:level3.html.twig', array(
         'form' => $form->createView(),
         'form_saveImage' => $form_saveImage->createView(),
-        'name_form' => $form_level2Name->createView(),'level2' => $level2, 'level0_id' => $level0_id, 'level1_id' => $level1_id,'level2_id' => $level2_id,
+        'form_saveMap' => $form_saveMap->createView(),
+        'name_form' => $form_level2Name->createView(),
+        'level2' => $level2, 'level0_id' => $level0_id, 'level1_id' => $level1_id,'level2_id' => $level2_id,
         'level2' => $level2, 'level3_assets' => $list_level3Assets,'asset_number' , 'asset_number' => $level1_assetsNumber  )); 
     } 
 
@@ -940,7 +1059,7 @@ class AppController extends Controller
       //When you query for a particular type of object, you always use what's known as its "repository". 
       $level3 = new Level3();
       $em = $this->getDoctrine()->getManager(); 
-      $level2= $em->getRepository('SeeItAllassetXploreBundle:Level3')->findOneBy(['id' => $level3_id]);
+      $level3= $em->getRepository('SeeItAllassetXploreBundle:Level3')->findOneBy(['id' => $level3_id]);
 
       if (null === $level3) {
         throw new NotFoundHttpException("the level3 with the id ".$level3_id." do not exist");
@@ -1057,6 +1176,10 @@ class AppController extends Controller
          $form = $this->get('form.factory')->create(level4Type::class, $level4);
          $form_saveImage = $this->get('form.factory')->create(saveImageType::class, $image);
          $form_level3Name= $this->get('form.factory')->create(level3NameType::class, $level3);
+         $data= array();
+         $form_saveMap  = $this->createFormBuilder($data)->add('file',   FileType::class)
+                                                         ->add('save',  SubmitType::class) //This form is not attached to a class
+                                                         ->getForm();
    
    
          
@@ -1080,7 +1203,29 @@ class AppController extends Controller
                'level0_id' => $level0_id,'level1_id' => $level1_id,'level2_id' => $level2_id, 'level3_id' => $level3_id)));     
            }
    
-           //FORM 2: changing the level3's name
+           $form_saveMap->handleRequest($request);
+           //FORM 2: adding maps
+           if ($form_saveMap->isSubmitted() &&  $form_saveMap->isValid()) { //CHECK whether this was submitted and whether it is valid 
+                 
+             $data = $form_saveMap->getData();
+             $uniqid= uniqid();
+             $data["file"]->move(
+                 $level3->getUploadRootDir().$level3->getMapsUploadDir(), // Le répertoire de destination
+                 $uniqid // Le nom du fichier à créer, ici « id.extension »
+                );
+     
+             $level3->setMapPath($level3->getMapsUploadDir().$uniqid);
+             $em->persist($level3); 
+             $em->flush(); 
+             
+     
+             //url redirection (solves reupload when refresh)
+             return $this->redirect($this->generateUrl('see_it_allasset_xplor_level4', array(
+                'level0_id' => $level0_id,'level1_id' => $level1_id,'level2_id' => $level2_id, 'level3_id' => $level3_id)));     
+           }
+        
+
+           //FORM 3: changing the level3's name
            $form_level3Name->handleRequest($request);
           
            if ($form_level3Name->isSubmitted() && $form_level3Name->isValid()) {
@@ -1098,7 +1243,7 @@ class AppController extends Controller
             }
    
    
-            //FORM 3: saving edited level4        
+            //FORM 4: saving edited level4        
             $form_saveImage->handleRequest($request);
    
             //This form doesn't hydrate directly the level4 object( which is totally possible), but instead he fill an image object (Objects/image) 
@@ -1107,29 +1252,36 @@ class AppController extends Controller
               $raw_data= $this->get('request_stack')->getCurrentRequest();  //take all the content of the resuest
               $edited_image= $raw_data->get('save-image-input-image');   //extract the raw base64 image data from the hidden input by giving it's name as param
     
-              define('UPLOAD_DIR', 'uploads/'); // define the upload path
+              define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+              define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
            
               
             //Here we extract the header from the raw 64base image data
-            $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
-            $img = str_replace(' ', '+', $img);
-            $data = base64_decode($img);
+              $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
+              $img = str_replace(' ', '+', $img);
+              $data = base64_decode($img);
               
               $filename=date('Y-m-d H:i:s');
-              $file = UPLOAD_DIR.$filename; // We give the file a unique name (converted timestamp)
-              $success = file_put_contents($file,  $data); //store the image data in a file
-              print $success ? $file : 'Unable to save the file.';
+              $filename_thumb = date('Y-m-d H:i:s');
+              $file_path = UPLOAD_DIR_STD.$filename;
+              $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+               // We give the file a unique name (converted timestamp)
+                $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+              print $success ? $file_path : 'Unable to save the file.';
     
-              //level4 hydration
-              $level4->setlevel4Name($filename);
-              $level4->setlevel4Image($file);
+              //Level's asset hydration
+              $level4->setLevel4Name($filename);
+              $level4->setImgPath($file_path);
+              $level4->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+              $level4->setUniqId(); 
+              $level4->setThumbPath($file_thumb_path); //stores the thumnail    
               $level4->setNote($image->getNote());
               $level4->setIdAsset($image->getAssetId());
               $level4->setContractNumber($image->getContractNumber());
     
               //storing the image in the db
+              $level4->setLevel3($level3);
               $em = $this->getDoctrine()->getManager();
-              $level4->setlevel3($level3);// link the edited level4 to a level3
               $em->persist($level4); 
               $em->flush();
     
@@ -1144,6 +1296,7 @@ class AppController extends Controller
          // twig template rendering
          return $this->render('SeeItAllassetXploreBundle:App:level4.html.twig', array(
            'form' => $form->createView(),
+           'form_saveMap' => $form_saveMap->createView(),
            'form_saveImage' => $form_saveImage->createView(),
            'name_form' => $form_level3Name->createView(),'level3' => $level3, 'level0_id' => $level0_id, 'level1_id' => $level1_id,'level2_id' => $level2_id,
            'level3' => $level3, 'level4_assets' => $list_level4Assets,'asset_number' , 'asset_number' => $level4_assetsNumber  )); 
@@ -1235,6 +1388,78 @@ class AppController extends Controller
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+public function saveEditedImage ($level){
+
+    define('UPLOAD_DIR_STD', 'uploads/'); // define the upload path for standard size
+    define('UPLOAD_DIR_THUMB', 'optim/');  // define the upload path for thumb size
+ 
+    
+  //Here we extract the header from the raw 64base image data
+  $img = str_replace('data:image/jpeg;base64,', '', $edited_image);
+  $img = str_replace(' ', '+', $img);
+  $data = base64_decode($img);
+    
+    $filename=date('Y-m-d H:i:s');
+    $filename_thumb = date('Y-m-d H:i:s');
+    $file_path = UPLOAD_DIR_STD.$filename;
+    $file_thumb_path = UPLOAD_DIR_THUMB.$filename;
+     // We give the file a unique name (converted timestamp)
+    $success = file_put_contents($file_path,  $data) && file_put_contents($file_thumb_path,  $data); //store the satandrd image data in a file
+    print $success ? $file_path : 'Unable to save the file.';
+
+    //Level's asset hydration
+    $level->setLevel0Name($filename);
+    $level->setImgPath($file_path);
+    $level->generateThumbnail($file_thumb_path, 300, 150, $quality = 75);
+    $level->setUniqId(); 
+    $level->setThumbPath($file_thumb_path); //stores the thumnail    
+    $level->setNote($image->getNote());
+    $level->setIdAsset($image->getAssetId());
+    $level->setContractNumber($image->getContractNumber());
+
+    //storing the image in the db
+    $em = $this->getDoctrine()->getManager();
+    $em->persist($level0); 
+    $em->flush();
+
+return $level;
+
+    $level1->setLevel0($level0);
+}
+
+
+*/
+
+
+
+
+
+
+
+    
 
     
 

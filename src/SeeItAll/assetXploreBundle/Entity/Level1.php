@@ -1,5 +1,6 @@
 <?php
         
+        
 namespace SeeItAll\assetXploreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class Level1
 {
+
+    private $uniqid ;
 
   /**
    * @ORM\ManyToOne(targetEntity="SeeItAll\assetXploreBundle\Entity\Level0" )
@@ -65,14 +68,26 @@ class Level1
      */
     private $level1Name;
 
- 
+    /**
+    *  @var string
+    * @ORM\Column(name="map_path", type="string", length=400, nullable=true)
+    */
+    private $map_path;
+    
 
     /**
      * @var string
      *
-     * @ORM\Column(name="level1_image", type="string", length=255, nullable=true)
+     * @ORM\Column(name="img_path", type="string", length=255, nullable=true)
      */
-    private $level1Image;
+    private $img_path;
+
+        /**
+     * @var string
+     *
+     * @ORM\Column(name="thumb_path", type="string", length=255, nullable=true)
+     */
+    private $thumb_path;
 
     /**
     *  @var string
@@ -87,6 +102,12 @@ class Level1
     */
     private $data_loc;
 
+
+     /**
+    *  @var string
+    * @ORM\Column(name="360_url", type="string", length=400, nullable=true)
+    */
+    private $url;
 
     /**
      * Get id
@@ -299,7 +320,14 @@ class Level1
   }
 
 
-private $uniqid;
+  public function getUniqiD(){
+    return $this->uniqid;
+}
+
+public function setUniqiD()
+{
+    return $this->uniqid= uniqid();
+}
 
 
   /**
@@ -313,10 +341,10 @@ private $uniqid;
     if (null === $this->file) {
       return;
     }
-            $this->uniqid = uniqid();
-              //$this->level1Name = date('Y-m-d H:i:s');
+            $this->setUniqId();
             $this->level1Name = $this->file->getClientOriginalName();
-             $this->level1Image = $this->getUploadDir().'/'.$this->uniqid;
+            $this->img_path = $this->getUploadDir().$this->getUniqId();
+            $this->thumb_path=  $this->getThumbUploadDir().$this->getUniqId().'_thumb';
              
   }
 
@@ -335,16 +363,15 @@ private $uniqid;
       if (null === $this->file) {
         return;
       }
-      //$storage = new StorageClient();  
+        //Create and upoad the thumbnail
+        $this->generateThumbnail($this->file, 300,150, $quality = 75);
 
-      //move_uploaded_file($this->file, "gs://assetxplor/".$this->level1Name);
- // On déplace le fichier envoyé dans le répertoire de notre choix
+        //upload the full size image
         $this->file->move(
-         $this->getUploadRootDir(), // Le répertoire de destination
-             $this->uniqid // Le nom du fichier à créer, ici « id.extension »
-            );
+            $this->getUploadRootDir().$this->getUploadDir(), // Le répertoire de destination
+            $this->uniqid // Le nom du fichier à créer, ici « id.extension »
+           );
       
-     // move_uploaded_file($this->file, "gs://${my_bucket}/{$this->level1Name}");
  
     }
 
@@ -366,24 +393,54 @@ private $uniqid;
     // En PostRemove, on n'a pas accès à l'id, on utilise notre nom sauvegardé
     if (file_exists($this->tempFilename)) {
       // On supprime le fichier
-      unlink($this->tempFilename);
+     // unlink($this->tempFilename);
     }
   }
 
   
-    public function getUploadDir()
-    {
-      // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
-      return 'uploads';
-    }
+  public function getUploadDir()
+  {
+    // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
+    return 'img/';
+  }
+  public function getMapsUploadDir()
+  {
+    // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
+    return 'maps/';
+  }
+
+  public function getThumbUploadDir()
+  {
+    // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
+    return 'optim/';
+  }
+
+  public function getUploadRootDir()
+  {
+    // On retourne le chemin relatif vers l'image pour notre code PHP
+    return __DIR__.'/../../../../web/';
+     
+  }
+
+  public function generateThumbnail($img, $width, $height, $quality = 90)
+  {
+      if (is_file($img)) {
+          $imagick = new \Imagick(realpath($img));
+          $imagick->setImageFormat('jpeg');
+          $imagick->setImageCompression(\Imagick::COMPRESSION_JPEG);
+          $imagick->setImageCompressionQuality($quality);
+          $imagick->thumbnailImage($width, $height, false, false);
+          //$filename_no_ext = reset(explode('.', $img));
+          if (file_put_contents( $this->getUploadRootDir().$this->getThumbUploadDir().$this->getUniqid().'_thumb', $imagick) === false) {
+            throw new Exception("Could not put contents.");
+        }
+          return true;
+      }
+      else {
+          throw new Exception("No valid image provided with {$img}.");
+      }
+  }
   
-    protected function getUploadRootDir()
-    {
-      // On retourne le chemin relatif vers l'image pour notre code PHP
-      return __DIR__.'/../../../../web/'.$this->getUploadDir();
-       
-    }
-    
 
 
 
@@ -424,5 +481,101 @@ private $uniqid;
     public function getLevel0()
     {
         return $this->level0;
+    }
+
+    /**
+     * Set imgPath.
+     *
+     * @param string|null $imgPath
+     *
+     * @return Level1
+     */
+    public function setImgPath($imgPath = null)
+    {
+        $this->img_path = $imgPath;
+
+        return $this;
+    }
+
+    /**
+     * Get imgPath.
+     *
+     * @return string|null
+     */
+    public function getImgPath()
+    {
+        return $this->img_path;
+    }
+
+    /**
+     * Set thumbPath.
+     *
+     * @param string|null $thumbPath
+     *
+     * @return Level1
+     */
+    public function setThumbPath($thumbPath = null)
+    {
+        $this->thumb_path = $thumbPath;
+
+        return $this;
+    }
+
+    /**
+     * Get thumbPath.
+     *
+     * @return string|null
+     */
+    public function getThumbPath()
+    {
+        return $this->thumb_path;
+    }
+
+    /**
+     * Set mapPath.
+     *
+     * @param string|null $mapPath
+     *
+     * @return Level1
+     */
+    public function setMapPath($mapPath = null)
+    {
+        $this->map_path = $mapPath;
+
+        return $this;
+    }
+
+    /**
+     * Get mapPath.
+     *
+     * @return string|null
+     */
+    public function getMapPath()
+    {
+        return $this->map_path;
+    }
+
+    /**
+     * Set url.
+     *
+     * @param string|null $url
+     *
+     * @return Level1
+     */
+    public function setUrl($url = null)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url.
+     *
+     * @return string|null
+     */
+    public function getUrl()
+    {
+        return $this->url;
     }
 }
