@@ -24,8 +24,8 @@
         <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images"> Location</button>
         <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>  
       </div>
-
-      <div class="body-notes"> WELCOME   &nbsp&nbsp&nbsp       to   &nbsp&nbsp&nbsp      <mark><strong>  ASSETXPLOR </strong> </mark> </div>
+ 
+      <div class="body-notes"> WELCOME   &nbsp&nbsp&nbsp       to   &nbsp&nbsp&nbsp      <mark><strong>  ASSETXPLOR </strong> </mark>  &nbsp&nbsp&nbsp {% if is_granted('IS_AUTHENTICATED_FULLY') %}     <strong>{{app.user.username}}</strong>  {% endif %}</div>
 
       <div class="body-url">
         <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
@@ -57,12 +57,16 @@
        {% for level0 in level0_assets %}
 
         <div class="image-item" 
+        
+        
          data-image="{{ asset(level0.getImgPath) }}"
          data-name="{{ level0.getlevel0Name }}"
-         data-remove="{{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}"
-         data-pdf="{{ path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId }) }}"
-         data-pin="{{ level0.getDataLoc }}"
+         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}  {% endif %}"
+         data-pdf="{% if is_granted("ROLE_ADMIN")  %}  {{   path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId })  }}   {% endif %} "
+         data-pin="{{  level0.getDataLoc }}"
          data-panorama="https://storage.googleapis.com/bamdata/panorama/panorama_tunnel_03_07_2018/R0010568.htm">
+       
+        
           <div class="image-item-image">
 
             <img src="{{asset(level0.getThumbPath) }}" alt="level0 1" />

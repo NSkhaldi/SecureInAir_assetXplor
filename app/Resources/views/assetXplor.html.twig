@@ -17,20 +17,24 @@
     {% block levels %}
       <div class="sidebar-menu">
         <a href="#" class="sidebar-menu-item" alt="Object">Level 0</a>
-        <a href="{{ path('see_it_allasset_xplor_locations') }}" class="sidebar-menu-item on" alt="Level 0">Level 1</a>  
+        <a href="{{ path('#') }}" class="sidebar-menu-item on" alt="Level 0">Level 1</a>  
         <a href="#" class="sidebar-menu-item  " alt="Building">Level 2<span class="badge">{{ buildings_number }}</span></a>
         <a href="#" class="sidebar-menu-item" alt="Room">Level 3</a>
         <a href="#" class="sidebar-menu-item" alt="Object">Level 4</a>
       </div>
     {% endblock %}
 
+    
       <div class="sidebar-footer">
-        <a href="#" class="sidebar-footer-item overview" alt="Overview">Overview</a>
+      
+        <a href="{{path('fos_user_security_logout')}}" class="sidebar-footer-item overview" alt="Overview"> <strong>LOGOUT</strong></a>
         <a href="#" class="sidebar-footer-item settings" alt="Settings">Settings</a>  
         <a href="#" class="sidebar-footer-item help" alt="Help">Help</a>
+         
         <div class="sidebar-footer-copy">&copy; 2018 AssetXplor ver. 0.0.1</div>
-      </div>
+      </div> w
     </div>
+   
 
     {% block body %}
     <!-- Body -->
@@ -45,7 +49,7 @@
         <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>  
       </div>
 
-      <div class="body-notes">Note: We work with one location</div>
+      <div class="body-notes"></div>
 
       <div class="body-url">
         <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
@@ -234,7 +238,7 @@
 
 
   <script  id="app-script" src="{{ asset('js/app.bundle.js') }}" ></script>
-    <script src="{{asset('js/editor.bundle.js') }}"></script>
+  <script src="{{asset('js/editor.bundle.js') }}"></script>
   <script src="{{ asset('js/vendors~editor.bundle.js') }}"></script>
   <script src="{{ asset('js/qrcode.bundle.js') }}"></script>
   <script src="{{ asset('js/vendors~qrcode.bundle.js') }}"></script>

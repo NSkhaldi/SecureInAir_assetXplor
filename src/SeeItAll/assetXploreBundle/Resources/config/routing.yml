@@ -5,18 +5,18 @@
 
 
 see_it_allasset_xplor_level0:
-    path:     /1
+    path:     /levels
     defaults: { _controller: SeeItAllassetXploreBundle:App:level0 }       
 
 
 see_it_allasset_xplor_level1:
-    path:     /1/{level0_id}   
+    path:     /levels/{level0_id}   
     defaults: { _controller: SeeItAllassetXploreBundle:App:level1 }  
     requirements:
         level0_id:    \d+  
 
 see_it_allasset_xplor_level2:
-    path:     /1/{level0_id}/{level1_id}     
+    path:     /levels/{level0_id}/{level1_id}     
     defaults: { _controller: SeeItAllassetXploreBundle:App:level2 } 
     requirements:
         level0_id:    \d+ 
@@ -24,7 +24,7 @@ see_it_allasset_xplor_level2:
            
 
 see_it_allasset_xplor_level3:
-    path:            /11/{level0_id}/{level1_id}/{level2_id}    
+    path:            /levels/{level0_id}/{level1_id}/{level2_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:level3 } 
     requirements: 
         level1_id:    \d+
@@ -33,7 +33,7 @@ see_it_allasset_xplor_level3:
        
 
 see_it_allasset_xplor_level4:
-    path:      /11/{level0_id}/{level1_id}/{level2_id}/{level3_id}       
+    path:      /levels/{level0_id}/{level1_id}/{level2_id}/{level3_id}       
     defaults: { _controller: SeeItAllassetXploreBundle:App:level4 }
     requirements: 
         level1_id:    \d+
@@ -49,13 +49,13 @@ see_it_allasset_xplor_level4:
 #REMOVE ASSETS ROUTES
 
 see_it_allasset_xplor_remove_level0:
-    path:     /remove/1/{level0_id}    
+    path:     /remove/{level0_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel0 }
     requirements: 
         level0_id:    \d+ 
 
 see_it_allasset_xplor_remove_level1:
-    path:     /remove/1/{level0_id} /{level1_id}    
+    path:     /remove/{level0_id} /{level1_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel1 }
     requirements:
         level0_id:    \d+ 
@@ -70,7 +70,7 @@ see_it_allasset_xplor_remove_level2:
         level2_id:    \d+  
   
 see_it_allasset_xplor_remove_level3:
-    path:     /remove/1/{level0_id}/{level1_id}/{level2_id}/{level3_id}      
+    path:     /remove/{level0_id}/{level1_id}/{level2_id}/{level3_id}      
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel3}    
     requirements:
         level0_id:    \d+ 
@@ -79,7 +79,7 @@ see_it_allasset_xplor_remove_level3:
         level3_id:    \d+
 
 see_it_allasset_xplor_remove_level4:
-    path:     /remove/1/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}       
+    path:     /remove/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}       
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel4}    
     requirements:
         level0_id:    \d+ 
@@ -94,13 +94,13 @@ see_it_allasset_xplor_remove_level4:
 #DOCS ROUTES
 
 see_it_allasset_xplor_level0_docs:
-    path:     /level0/docs/{level0_id}    
+    path:     /docs/level0/{level0_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:doclevel0 }
     requirements: 
         level1_id:    \d+  
 
 see_it_allasset_xplor_level1_docs:
-    path:     /level1/docs/{level0_id}/{level1_id}    
+    path:     /docs/level1/{level0_id}/{level1_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:doclevel1 }
     requirements: 
         level0_id:    \d+
@@ -139,7 +139,7 @@ see_it_allasset_xplor_level4_docs:
 
 
 see_it_allasset_xplor_remove_level0_docs:
-    path:     /remove/docs/1/{document_id}/{level0_id}    
+    path:     /remove/docs/{document_id}/{level0_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:RemoveLevel0Doc }
     requirements: 
         document_id:   \d+
@@ -147,7 +147,7 @@ see_it_allasset_xplor_remove_level0_docs:
         level1_id:    \d+   
 
 see_it_allasset_xplor_remove_level1_docs:
-    path:     /remove/docs/1/{document_id}/{level0_id}/{level1_id}    
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}    
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel1Doc }
     requirements: 
         document_id:   \d+
@@ -155,7 +155,7 @@ see_it_allasset_xplor_remove_level1_docs:
         level1_id:    \d+    
 
 see_it_allasset_xplor_remove_level2_docs:
-    path:     /remove/docs/1/{document_id}/{level0_id}/{level1_id}/{level2_id}     
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}/{level2_id}     
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel2Doc }  
     requirements: 
         document_id:   \d+
@@ -164,7 +164,7 @@ see_it_allasset_xplor_remove_level2_docs:
         level2_id:    \d+  
   
 see_it_allasset_xplor_remove_level3_docs:
-    path:     /remove/docs/1/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}      
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}      
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel3Doc}    
     requirements: 
         document_id:   \d+
@@ -174,7 +174,7 @@ see_it_allasset_xplor_remove_level3_docs:
         level3_id:    \d+
 
 see_it_allasset_xplor_remove_level4_docs:
-    path:     /remove/docs/1/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}      
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}      
     defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel4Doc}    
     requirements: 
         document_id:   \d+

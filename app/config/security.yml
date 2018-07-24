@@ -9,7 +9,7 @@ security:
 
     role_hierarchy:
         ROLE_ADMIN:       [ROLE_EDITOR, ROLE_VIEWER]
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
 
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
@@ -41,7 +41,11 @@ security:
                 secret:     %secret% # %secret% est un paramètre de parameter
 
     access_control:
-        - { path: ^/1, role: ROLE_ADMIN, requires_channel: https }
+        - { path: ^/levels, role: ROLE_VIEWER, requires_channel: https }
+        - { path: ^/remove, role: ROLE_EDITOR, requires_channel: https }
+        - { path: ^/remove, role: ROLE_ADMIN,  requires_channel: https }
+        - { path: ^/docs,   role: ROLE_ADMIN,  requires_channel: https }
+        
             # activate different ways to authenticate
 
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
