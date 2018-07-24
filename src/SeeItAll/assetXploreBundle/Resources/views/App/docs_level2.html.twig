@@ -76,7 +76,7 @@
 
 
     {% block image %}
-
+        {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %}
         <!-- Add images popup -->
           <div class="add-images-container" id="add-images-container">
          {{ form_start(form_saveDoc, {'attr' : {'class' :'add-images-form'}}) }}
@@ -92,7 +92,7 @@
           </div>
         
       </div>
-
+        {% endif %}
   {% endblock %}
 
 

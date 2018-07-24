@@ -109,6 +109,7 @@
 
 
     {% block UploadMap %}
+     {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %}
         <!-- Add map popup -->
     <div class="add-map-container" id="add-map-container">
     {{ form_start(form_saveMap, {'attr' : {'class' :'add-map-form' }}) }}  
@@ -120,4 +121,6 @@
         </div>
     {{ form_end(form_saveMap) }}
     </div>
+
+    {% endif %}
     {% endblock %}

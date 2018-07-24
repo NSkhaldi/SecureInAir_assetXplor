@@ -62,7 +62,7 @@
          data-image="{{ asset(level0.getImgPath) }}"
          data-name="{{ level0.getlevel0Name }}"
          data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}  {% endif %}"
-         data-pdf="{% if is_granted("ROLE_ADMIN")  %}  {{   path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId })  }}   {% endif %} "
+         data-pdf="  {{   path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId })  }}   "
          data-pin="{{  level0.getDataLoc }}"
          data-panorama="https://storage.googleapis.com/bamdata/panorama/panorama_tunnel_03_07_2018/R0010568.htm">
        

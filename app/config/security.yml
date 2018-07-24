@@ -8,9 +8,10 @@ security:
      
 
     role_hierarchy:
-        ROLE_ADMIN:       [ROLE_EDITOR, ROLE_VIEWER]
-        ROLE_EDITOR:      [ROLE_VIEWER]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_ADMIN:       [ROLE_EDITOR]
+        ROLE_EDITOR:      [ROLE_VIEWER]
+        
 
 
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
@@ -44,8 +45,7 @@ security:
     access_control:
         - { path: ^/levels, role: ROLE_VIEWER, requires_channel: https }
         - { path: ^/remove, role: ROLE_EDITOR, requires_channel: https }
-        - { path: ^/remove, role: ROLE_ADMIN,  requires_channel: https }
-        - { path: ^/docs,   role: ROLE_ADMIN,  requires_channel: https }
+        - { path: ^/docs,   role: ROLE_VIEWER,  requires_channel: https }
         
             # activate different ways to authenticate
 
