@@ -18,8 +18,9 @@
 
       <div class="body-header">
         <form class="body-header-name" method="GET" action="/app.html">
+        <!--
           <input type="text" name="location-name" value="Location Name" maxlength="50" required class="input" />
-          <button type="submit" aria-label="Save" class="button">Save</button>
+          <button type="submit" aria-label="Save" class="button">Save</button> -->
         </form>
         <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images"> Location</button>
         <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>  
@@ -56,21 +57,24 @@
 
        {% for level0 in level0_assets %}
 
+        {% if level0.display == 1 %}
+
         <div class="image-item" 
-        
-        
          data-image="{{ asset(level0.getImgPath) }}"
          data-name="{{ level0.getlevel0Name }}"
          data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}  {% endif %}"
          data-pdf="  {{   path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId })  }}   "
          data-pin="{{  level0.getDataLoc }}"
-         data-panorama="https://storage.googleapis.com/bamdata/panorama/panorama_tunnel_03_07_2018/R0010568.htm">
+         data-image-id="{{ level0.getId }}">
        
         
           <div class="image-item-image">
 
             <img src="{{asset(level0.getThumbPath) }}" alt="level0 1" />
             <a href="{{ path('see_it_allasset_xplor_level1', {'level0_id': level0.getId }) }}" class="image-item-button enter" title="Navigate to the next level"></a>
+            {% if level0.getUrl is not null %}
+            <a href="{{  level0.getUrl }}" class="image-item-panorama-link" title="Open 360 View" target="_blank"></a>
+            {% endif %}
             <button type="button" class="image-item-button more" aria-label="More"></button>
 
           </div>
@@ -82,7 +86,32 @@
           </div>
         </div>
 
+            {% else %}
+
+        <div class="image-item item-door"
+         data-image="{{ asset(level0.getImgPath) }}"
+         data-name="{{ level0.getlevel0Name }}"
+         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level0.getId }) }}  {% endif %}"
+         data-pdf="  {{   path('see_it_allasset_xplor_level0_docs', {'level0_id': level0.getId })  }}   "
+         data-pin="{{  level0.getDataLoc }}"
+         data-image-id="{{ level0.getId }}">
+
+          <div class="image-item-image">
+            <a href="{{ path('see_it_allasset_xplor_level1', {'level0_id': level0.getId }) }}" class="image-item-button enter" title="Navigate to the level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+          </div>
+         <div class="image-item-label">
+            {{ level0.getlevel0Name }}
+            <span class="badge location">1</span>
+            <span class="badge level0">{{ level0.getIdasset}}</span> 
+          </div>
+        </div>  
+
+            {% endif %}
+
           {% endfor %}
+
+
 
         
     </div>
@@ -91,21 +120,38 @@
 
      
      {% block PinEeditor %} 
-     {% for level0 in level0_assets %}
-     <!-- Pin Editor popup -->
-    <div class="pin-editor" id="pin-editor">
-      <form class="pin-editor-form" method="GET" action="{{ path('see_it_allasset_xplor_level0_loc', {'level0_id': level0.getId}) }}" >
+    <div class="modal pin-editor" id="pin-editor">
+      <form id="pin-editor-form" class="modal-body pin-editor-body" method="GET" action="{{ app.request.baseurl }}/loc/">
         <h1 id="pin-editor-header">Pin Editor</h1>
         <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
         <div class="pin-editor-container" id="pin-editor-container">
           <div class="map-pin" id="pin-editor-pin"></div>
-            <img class="pin-editor-image" src="{{asset('assets/tmp/dutch_map.jpg') }}" />  
+          <img class="pin-editor-image" src="{{asset('assets/tmp/dutch_map.jpg') }}" />
         </div>
         <div class="button-group">
           <button type="button" id="pin-editor-cancel" class="button">Cancel</button>
-          <button   type="submit" class="button-blue">Save</button>
+          <button type="submit" class="button-blue">Save</button>
         </div>
       </form>
     </div>
-     {% endfor %}
     {% endblock %}
+
+
+    {% block urlForm %}
+    {% set action = app.request.baseurl ~ "/url/" %}
+    <!-- Edit 360 URL popup -->
+    <div class="modal" id="edit-panorama">   
+      {{ form_start(form_level0Url, {'attr' : {'class' :'modal-body', 'id':'edit-panorama-form', 'action' : action  }} ) }}
+        <h1>Add 360</h1>
+        <label for="save-image-input-note">360 URL
+          {{ form_widget(form_level0Url.url, { 'attr': {'id': 'edit-panorama-url-input', 'maxlength': '400', 'placeholder': 'Enter 360 URL', 'name': 'note', 'required class' : 'input', 'value' : ''  } }) }}
+        </label>
+        <div class="button-group">
+          <button type="button" id="edit-panorama-cancel" class="button">Cancel</button>
+          {{ form_widget(form_level0Url.save, { 'attr': {'class': 'button-blue', 'type' : 'save' } }) }}
+        </div>
+      {{ form_end(form_level0Url) }}
+    </div>
+    {% endblock %}
+
+   

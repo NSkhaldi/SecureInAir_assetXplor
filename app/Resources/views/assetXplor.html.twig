@@ -95,7 +95,9 @@
          data-remove="{{ path('see_it_allasset_xplor_remove_buildings', {'building_id': building.getId }) }}"
          data-pdf="{{ path('see_it_allasset_xplor_buildings_docs', {'building_id': building.getId }) }}"
          data-pin={{ building.getDataLoc }}
-         data-panorama="http://www.assetxplor.nl/app/Symfony/web/">
+         data-panorama="http://www.assetxplor.nl/app/Symfony/web/"
+         data-image-id="">
+         
           <div class="image-item-image">
 
             <img src="{{asset(building.getBuildingImage) }}" alt="Building 1" />
@@ -118,7 +120,7 @@
     <!--- End of the body -->
 
 
-
+    {% block editor %}
     <!-- Editor -->
     <div class="editor-container" id="editor-container">
       <div class="editor-toolbar" id="editor-toolbar">
@@ -134,19 +136,40 @@
           <button class="editor-button arrow" class="editor-button arrow" name="tool" data-tool="arrow" title="Arrow" />
           <button class="editor-button pen" class="editor-button pen" name="tool" data-tool="pen" title="Pen" />
         </div>
+         <button class="editor-button rotate" title="Rotate" aria-label="Rotate" />
         <button class="editor-button cancel" aria-label="Cancel" id="editor-cancel">Cancel</button>
         <button class="editor-button save" aria-label="Save" id="editor-save">Save</button>
       </div>
-      <div id="editor-image" class="editor-image"></div>
+      <div class="editor-image">
+        <div id="editor-image-canvas" class="editor-image-canvas">
+          <canvas id="editor-image-base" class="editor-image-base"></canvas>
+          <canvas id="editor-image-draw" class="editor-image-draw"></canvas>
+        </div>
+      </div>
     </div>
+    {% endblock %}
 
      {% block image %}
     <!-- Add images popup -->
-    <div class="add-images-container" id="add-images-container">
+    <div class="modal"  class="add-image-modal" id="add-image-modal">
       
-      {{ form_start(form, {'attr' : {'class' :'add-images-form'}}) }}
+      {{ form_start(form, {'attr' : {'class' :'modal-body'}}) }}
         <h1>Add Images</h1>
-        {{ form_widget(form.file) }}
+
+        <div class="add-image-modal-radios">		      
+	          <label class="radio" for="add-image-radio-image">		
+	
+              {% block display %}  {{ form_widget(form.display,  { 'attr': { 'name' : 'image-type' } }) }} {% endblock %}
+                Display the Image		
+	            <div class="radio-mark"></div>		
+	          </label>		
+	          <!--<label class="radio" for="add-image-radio-door">		
+	            <input type="radio" name="image-type" checked /> Button		
+	            <div class="radio-mark"></div>		
+	          </label>	-->	
+	        </div>
+
+        {{ form_widget(form.file,  { 'attr': { } }) }}
         <label for="add-images-input-note">Note
           {{ form_widget(form.note, { 'attr': {'placeholder': 'Enter note', 'maxlength': '50', 'name': 'note', 'id' : 'add-image-input-note', 'value' : '-' } }) }}
         </label>
@@ -169,10 +192,10 @@
 
     {% block saveimage %}
     <!-- Save image popup -->
-    <div class="add-images-container" id="save-image-container">
-      {{ form_start(form_saveImage, {'attr' : {'class' :'add-images-form'}}) }}
+    <div class="modal" id="save-image-modal">
+      {{ form_start(form_saveImage, {'attr' : {'class' :'modal-body'}}) }}
         <h1>Save Image</h1>
-        <img class="add-images-image" id="save-image-tag" />
+        <img class="add-image-modal-image" id="save-image-tag" />
          
          <input type="hidden" id="save-image-input-image" name="save-image-input-image" value="" /> 
         <label for="save-image-input-note">Note
@@ -197,8 +220,8 @@
 
     {% block PinEeditor %} 
      <!-- Pin Editor popup -->
-    <div class="pin-editor" id="pin-editor">
-      <form class="pin-editor-form" method="GET"  >
+    <div class="modal-pin-editor" id="pin-editor">
+      <form class="modal-body pin-editor-body" method="GET"  >
         <h1 id="pin-editor-header">Pin Editor</h1>
         <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
         <div class="pin-editor-container" id="pin-editor-container">
@@ -216,8 +239,8 @@
 
     {% block UploadMap %}
         <!-- Add map popup -->
-    <div class="add-map-container" id="add-map-container">
-      <form class="add-map-form" method="GET">
+    <div class="modal" id="add-map-modal">
+      <form class="modal-body" method="GET">
         <h1>Upload map</h1>
         <input type="file">
         <div class="button-group">
@@ -228,6 +251,26 @@
     </div>
     {% endblock %}
 
+
+    {% block urlForm %}
+    <!-- Edit 360 URL popup -->
+    <div class="modal" id="edit-panorama">   
+      <form id="edit-panorama-form" class="modal-body" method="GET">
+        <h1>Add 360</h1>
+        <label for="save-image-input-note">360 URL
+          <input type="text" placeholder="Enter 360 URL" maxlength="400" name="note" value="" id="edit-panorama-url-input" />
+        </label>
+        <div class="button-group">
+          <button type="button" id="edit-panorama-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+    {% endblock %}
+
+
+
+
   </main>
 
 
@@ -237,11 +280,18 @@
 <!-- htese files are imported from the web directory       camera.bundle.js      instascan.min.js  qrcode.bundle.js   vendors~editor.bundle.js  vendors~qrcode.bundle.js  !-->
 
 
-  <script  id="app-script" src="{{ asset('js/app.bundle.js') }}" ></script>
-  <script src="{{asset('js/editor.bundle.js') }}"></script>
-  <script src="{{ asset('js/vendors~editor.bundle.js') }}"></script>
-  <script src="{{ asset('js/qrcode.bundle.js') }}"></script>
-  <script src="{{ asset('js/vendors~qrcode.bundle.js') }}"></script>
+  <script  id="app-script" src="{{ asset('jss/app.bundle.js') }}" ></script>
+  <script src="{{ asset('jss/vendors~editor.bundle.js') }}"></script>
+  <script src="{{asset('jss/editor.bundle.js') }}"></script>
+  <script src="{{asset('jss/vendors~qrcode.bundle.js') }}"></script>
+  <script src="{{asset('jss/instascan.min.js') }}"></script>
+  <script src="{{asset('jss/camera.bundle.js') }}"></script>
+   <script src="{{asset('jss/annotate.bundle.js') }}"></script>
+  
+ 
+ 
+  
+  
 
 
 

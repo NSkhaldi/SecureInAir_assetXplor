@@ -11,6 +11,7 @@
       </div>
     {% endblock %}
 
+{% block display %}  {{ form_widget(form.display,  { 'attr': { 'name' : 'image-type' } }) }} {% endblock %}
 
 {% block body %}
 <!-- Body -->
@@ -50,12 +51,12 @@
           </div>
         </div>
 
-      <!-- Body > Main Map -->
+       <!-- Body > Main Map -->
         <div class="main-map">
           <div id="main-map-container" class="main-map-container">
             <div class="main-map-inner">
             {% if level1.getMapPath is null %}
-                <img src="{{asset('assets/tmp/add_map.png')}}" />
+                <img src="{{asset('assets/tmp/upload_map.png') }}" />
             {% else %}
                 <img src="{{asset(level1.getMapPath)}}" />
             {% endif %}
@@ -79,18 +80,23 @@
 
          {% for level2 in  level2_assets %}
 
+            {% if level2.display == 1 %}
         
          <div class="image-item" 
          data-image="{{ asset(level2.getImgPath) }}"
          data-name="{{ level2.getLevel2Name }}"
          data-remove="{{ path('see_it_allasset_xplor_remove_level2', {'level0_id': level0_id, 'level1_id': level1.getId , 'level2_id': level2.getId }) }}"
          data-pdf="{{ path('see_it_allasset_xplor_level2_docs',  {'level0_id': level0_id ,'level1_id': level1.getId , 'level2_id': level2.getId }) }}" 
-         data-grid="0001000001000000000000000000000000100000000001000000000000000100000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000110000000000000000000000000000011110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-         data-panorama="">
+         data-pin="{{  level2.getDataLoc }}"
+         data-image-id="{{ level2.getId }}">
+
           <div class="image-item-image">
 
             <img src="{{asset(level2.getThumbPath) }}" alt="level1 2" />
             <a href="{{ path('see_it_allasset_xplor_level3', {'level0_id': level0_id, 'level1_id': level1.getId, 'level2_id': level2.getId }) }}" class="image-item-button enter" title="Navigate to the level"></a>
+            {% if level2.getUrl is not null %}
+            <a href="{{  level2.getUrl }}" class="image-item-panorama-link" title="Open 360 View" target="_blank"></a>
+            {% endif %}
             <button type="button" class="image-item-button more" aria-label="More"></button>
 
           </div>
@@ -101,6 +107,30 @@
             <span class="badge level1">{{ level2.getIdAsset }}</span> 
           </div>
         </div>
+
+            {% else %}
+
+        <div class="image-item item-door"
+         data-image="{{ asset(level2.getImgPath) }}"
+         data-name="{{ level2.getlevel2Name }}"
+         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level2.getId }) }}  {% endif %}"
+         data-pdf="{{ path('see_it_allasset_xplor_level2_docs',  {'level0_id': level0_id ,'level1_id': level1.getId , 'level2_id': level2.getId }) }}" 
+         data-pin="{{  level2.getDataLoc }}"
+         data-image-id="{{ level2.getId }}">
+
+          <div class="image-item-image">
+          <a href="{{ path('see_it_allasset_xplor_level3', {'level0_id': level0_id, 'level1_id': level1.getId, 'level2_id': level2.getId }) }}" class="image-item-button enter" title="Navigate to the level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+          </div>
+         <div class="image-item-label">
+            {{ level2.getlevel2Name }}
+            <span class="badge location">1</span>
+            <span class="badge level0">{{ level2.getIdasset}}</span> 
+          </div>
+        </div>  
+
+            {% endif %}
+
           {% endfor %}
     </div>
     <!--- End of the body -->
@@ -109,8 +139,8 @@
 
     {% block UploadMap %}
         <!-- Add map popup -->
-    <div class="add-map-container" id="add-map-container">
-    {{ form_start(form_saveMap, {'attr' : {'class' :'add-map-form' }}) }}  
+    <div class="modal" id="add-map-modal">
+    {{ form_start(form_saveMap, {'attr' : {'class' :'modal-body' }}) }}  
         <h1>Upload map</h1>   
         {{ form_widget(form_saveMap.file) }}
         <div class="button-group">
@@ -118,5 +148,45 @@
             {{ form_widget(form_saveMap.save,  { 'attr': {'class' : 'button-blue'} })  }}
         </div>
     {{ form_end(form_saveMap) }}
+    </div>
+    {% endblock %}
+
+
+     {% block PinEeditor %} 
+    <div class="modal pin-editor" id="pin-editor">
+      <form id="pin-editor-form" class="modal-body pin-editor-body" method="GET" action="{{ app.request.baseurl }}/loc/{{level0_id}}/{{level1_id}}/">
+        <h1 id="pin-editor-header">Pin Editor</h1>
+        <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
+        <div class="pin-editor-container" id="pin-editor-container">
+          <div class="map-pin" id="pin-editor-pin"></div>
+          {% if level1.getMapPath is null %}
+                <img class="pin-editor-image" src="{{asset('assets/tmp/upload_map.png') }}" />
+            {% else %}
+                <img class="pin-editor-image" src="{{asset(level1.getMapPath)}}" />
+            {% endif %}
+        </div>
+        <div class="button-group">
+          <button type="button" id="pin-editor-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+    {% endblock %}
+
+    
+    {% block urlForm %}
+    {% set action = app.request.baseurl ~ "/url/" ~ level0_id ~ "/" ~ level1_id ~ "/" %}
+    <!-- Edit 360 URL popup -->
+    <div class="modal" id="edit-panorama">   
+      {{ form_start(form_level2Url, {'attr' : {'class' :'modal-body', 'id':'edit-panorama-form', 'action' : action  }} ) }}
+        <h1>Add 360</h1>
+        <label for="save-image-input-note">360 URL
+          {{ form_widget(form_level2Url.url, { 'attr': {'id': 'edit-panorama-url-input', 'maxlength': '400', 'placeholder': 'Enter 360 URL', 'name': 'note', 'required class' : 'input', 'value' : ''  } }) }}
+        </label>
+        <div class="button-group">
+          <button type="button" id="edit-panorama-cancel" class="button">Cancel</button>
+          {{ form_widget(form_level2Url.save, { 'attr': {'class': 'button-blue', 'type' : 'save' } }) }}
+        </div>
+      {{ form_end(form_level2Url) }}
     </div>
     {% endblock %}
