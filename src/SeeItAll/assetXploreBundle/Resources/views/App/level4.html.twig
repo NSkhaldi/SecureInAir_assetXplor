@@ -8,6 +8,9 @@
         <a href="{{ path('see_it_allasset_xplor_level2',{'level0_id': level0_id, 'level1_id': level1_id}) }}" class="sidebar-menu-item" alt="Building">Level 2</a>
         <a href="{{ path('see_it_allasset_xplor_level3',{'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id}) }}" class="sidebar-menu-item  " alt="Room">Level 3 </a></a>
         <a href="#" class="sidebar-menu-item on " alt="Object">Level 4 </a>
+        <a href="#" class="sidebar-menu-item" alt="Room">Level 5</a>
+        <a href="#" class="sidebar-menu-item" alt="Object">Level 6</a>
+        
       </div>
     {% endblock %}
 
@@ -93,7 +96,7 @@
           <div class="image-item-image">
 
             <img src="{{asset(level4.getThumbPath) }}" alt="level1 2" />
-            <a href="" class="image-item-button enter" title="Navigate to the level"></a>
+            <a href="{{ path('see_it_allasset_xplor_level5', {'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id, 'level3_id': level3.getId, 'level4_id': level4.getId}) }}" class="image-item-button enter" title="Navigate to the level"></a>
             {% if level4.getUrl is not null %}
             <a href="{{  level4.getUrl }}" class="image-item-panorama-link" title="Open 360 View" target="_blank"></a>
             {% endif %}
@@ -113,7 +116,7 @@
         <div class="image-item item-door"
          data-image="{{ asset(level4.getImgPath) }}"
          data-name="{{ level4.getlevel4Name }}"
-         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level0', {'level0_id': level4.getId }) }}  {% endif %}"
+         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level4', {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3.getId,'level4_id': level4.getId }) }}  {% endif %}"
          data-pdf="{{ path('see_it_allasset_xplor_level4_docs',  {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2_id , 'level3_id': level3.getId,'level4_id': level4.getId }) }}" 
          data-pin="{{  level4.getDataLoc }}"
          data-image-id="{{ level4.getId }}">

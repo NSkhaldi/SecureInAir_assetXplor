@@ -1,0 +1,193 @@
+{% extends "::assetXplor.html.twig" %}
+
+
+ {% block levels %}
+      <div class="sidebar-menu">
+        <a href="{{ path('see_it_allasset_xplor_level0') }}" class="sidebar-menu-item" alt="Object">Level 0</a>
+        <a href="{{ path('see_it_allasset_xplor_level1', {'level0_id': level0_id}) }}" class="sidebar-menu-item " alt="Level 0">Level 1</a>  
+        <a href="{{ path('see_it_allasset_xplor_level2',{'level0_id': level0_id, 'level1_id': level1_id}) }}" class="sidebar-menu-item" alt="Building">Level 2</a>
+        <a href="{{ path('see_it_allasset_xplor_level3',{'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id}) }}" alt="Room" class="sidebar-menu-item">Level 3 </a></a>
+        <a href="{{ path('see_it_allasset_xplor_level4',{'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id, 'level3_id': level3_id}) }}" class="sidebar-menu-item"  alt="Object">Level 4 </a>
+        <a href="{{ path('see_it_allasset_xplor_level5',{'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id, 'level3_id': level3_id, 'level4_id': level4_id}) }}" class="sidebar-menu-item"  alt="Object">Level 5 </a>
+        <a href="#" class="sidebar-menu-item on " alt="Object">Level 6</a>
+        
+      </div>
+    {% endblock %}
+
+
+
+{% block body %}
+<!-- Body -->
+    <div class="body">
+
+      <div class="body-header">
+       <!-- <form class="body-header-name" method="GET" action="/app.html">
+          <input type="text" name="location-name" value="Location Name" maxlength="50" required class="input" />
+          <button type="submit" aria-label="Save" class="button">Save</button>
+        </form> -->
+
+        {{ form_start(name_form, {'attr' : {'class' :'body-header-name'}}) }}
+        {{ form_widget(name_form.level5_name, { 'attr': { 'maxlength': '50', 'name': 'location-name', 'required class' : 'input', 'value' : level5.getlevel5Name } }) }}
+        {{ form_widget(name_form.save, { 'attr': {'class': 'button' } }) }}
+        {{ form_end(name_form) }}
+
+        <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images">object</button>
+        <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>
+      </div>
+
+      <div class="body-notes">Note: {{level5.getNote}} </div>
+
+
+      <div class="body-url">
+        <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
+        <button type="button" class="button body-url-copy" id="button-copy-url" aria-label="Copy URL" data-clipboard-target="#body-url">Copy URL</button>
+        <button type="button" class="button body-url-qr" id="button-qr" aria-label="Get QR-code" data-target="#body-url">Get QR-code</button>
+      </div>
+
+
+
+          <div class="image-map-container">
+        <div id="main-image" class="main-image" data-pdf="{{ path('see_it_allasset_xplor_level5_docs',  {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3_id,'level4_id': level4_id,'level5_id': level5.getId }) }}" >
+                  <div class="main-image-inner">
+            <img src="{{ asset( level5.getThumbPath ) }}" />
+            <button type="button" class="main-image-button more" aria-label="More"></button>
+          </div>
+        </div>
+
+ <!-- Body > Main Map -->
+        <div class="main-map">
+          <div id="main-map-container" class="main-map-container">
+            <div class="main-map-inner">
+            {% if level5.getMapPath is null %}
+                <img src="{{asset('assets/tmp/upload_map.png') }}" />
+            {% else %}
+                <img src="{{asset(level5.getMapPath)}}" />
+            {% endif %}
+                <button type="button" class="main-map-button more" aria-label="More"></button>
+            </div>
+          </div>
+          <!--
+          <label class="radio" for="floor1">
+            <input type="radio" id="floor1" name="floor" checked /> Floor 1
+            <div class="radio-mark"></div>
+          </label>
+          <label class="radio" for="floor2">
+            <input type="radio" id="floor2" name="floor" /> Floor 2
+            <div class="radio-mark"></div>
+          </label> -->
+        </div>
+      </div>
+
+
+     <!-- Body > Frame Images -->
+      <div class="body-image-list" id="image-list">
+
+         {% for level6 in  level6_assets %}
+
+             {% if level6.display == 1 %}
+        
+         <div class="image-item" 
+         data-image="{{ asset(level6.getImgPath) }}"
+         data-remove="{{ path('see_it_allasset_xplor_remove_level6', {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3_id,'level4_id': level4_id,'level5_id': level5.getId,'level6_id': level6.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_level6_docs',  {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2_id , 'level3_id': level3_id,'level4_id': level4_id,'level5_id': level5.getId,'level6_id': level6.getId   }) }}" 
+         data-pin="{{  level6.getDataLoc }}"
+         data-image-id="{{ level6.getId }}">
+          <div class="image-item-image">
+
+            <img src="{{asset(level6.getThumbPath) }}" alt="level1 2" />
+            <a href="{{ path('see_it_allasset_xplor_level6', {'level0_id': level0_id, 'level1_id': level1_id, 'level2_id': level2_id, 'level3_id': level3_id, 'level4_id': level4_id, 'level5_id': level5.getId}) }}" class="image-item-button enter" title="Navigate to the level"></a>
+            {% if level6.getUrl is not null %}
+            <a href="{{  level6.getUrl }}" class="image-item-panorama-link" title="Open 360 View" target="_blank"></a>
+            {% endif %}
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+
+          </div>
+
+          <div class="image-item-label">
+            <span class="badge location">1</span>
+            <span class="badge level1">{{ level6.getIdAsset }}</span> 
+          </div>
+        </div>
+
+            {% else %}
+
+        <div class="image-item item-door"
+         data-image="{{ asset(level6.getImgPath) }}"
+         data-name="{{ level6.getlevel6Name }}"
+         data-remove="  {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %} {{ path('see_it_allasset_xplor_remove_level6', {'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id, 'level3_id': level3_id,'level4_id': level4.getId,'level5_id': level5.getId }) }}  {% endif %}"
+         data-pdf="{{ path('see_it_allasset_xplor_level6_docs',  {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2_id , 'level3_id': level3_id,'level4_id': level4.getId,'level5_id': level5.getId  }) }}" 
+         data-pin="{{  level6.getDataLoc }}"
+         data-image-id="{{ level6.getId }}">
+
+          <div class="image-item-image">
+             <a href="" class="image-item-button enter" title="Navigate to the level"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+          </div>
+         <div class="image-item-label">
+            {{ level6.getlevel6Name }}
+            <span class="badge location">1</span>
+            <span class="badge level0">{{ level6.getIdasset}}</span> 
+          </div>
+        </div>  
+
+            {% endif %}
+          {% endfor %}
+    </div>
+    <!--- End of the body -->
+
+    {% endblock %}
+
+
+
+    {% block UploadMap %}
+        <!-- Add map popup -->
+   <div class="modal" id="add-map-modal">
+    {{ form_start(form_saveMap, {'attr' : {'class' :'modal-body' }}) }}  
+        <h1>Upload map</h1>   
+        {{ form_widget(form_saveMap.file) }}
+        <div class="button-group">
+            <button type="button" id="add-map-cancel" class="button">Cancel</button>
+            {{ form_widget(form_saveMap.save,  { 'attr': {'class' : 'button-blue'} })  }}
+        </div>
+    {{ form_end(form_saveMap) }}
+    </div>
+    {% endblock %}
+
+    {% block PinEeditor %} 
+    <div class="modal pin-editor" id="pin-editor">
+      <form id="pin-editor-form" class="modal-body pin-editor-body" method="GET" action="{{ app.request.baseurl }}/loc/{{level0_id}}/{{level1_id}}/{{level2_id}}/{{level3_id}}/{{level4_id}}/{{level5_id}}/">
+        <h1 id="pin-editor-header">Pin Editor</h1>
+        <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
+        <div class="pin-editor-container" id="pin-editor-container">
+          <div class="map-pin" id="pin-editor-pin"></div>
+          {% if level5.getMapPath is null %}
+                <img class="pin-editor-image" src="{{asset('assets/tmp/upload_map.png') }}" />
+            {% else %}
+                <img class="pin-editor-image" src="{{asset(level5.getMapPath)}}" />
+            {% endif %}
+        </div>
+        <div class="button-group">
+          <button type="button" id="pin-editor-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+    {% endblock %}
+
+
+    {% block urlForm %}
+    {% set action = app.request.baseurl ~ "/url/" ~ level0_id ~ "/" ~ level1_id ~ "/" ~ level2_id ~ "/" ~ level3_id ~ "/" ~ level4_id ~ "/"~ level5_id ~ "/"  %}
+    <!-- Edit 360 URL popup -->
+    <div class="modal" id="edit-panorama">   
+      {{ form_start(form_level6Url, {'attr' : {'class' :'modal-body', 'id':'edit-panorama-form', 'action' : action  }} ) }}
+        <h1>Add 360</h1>
+        <label for="save-image-input-note">360 URL
+          {{ form_widget(form_level6Url.url, { 'attr': {'id': 'edit-panorama-url-input', 'maxlength': '400', 'placeholder': 'Enter 360 URL', 'name': 'note', 'required class' : 'input', 'value' : ''  } }) }}
+        </label>
+        <div class="button-group">
+          <button type="button" id="edit-panorama-cancel" class="button">Cancel</button>
+          {{ form_widget(form_level6Url.save, { 'attr': {'class': 'button-blue', 'type' : 'save' } }) }}
+        </div>
+      {{ form_end(form_level6Url) }}
+    </div>
+    {% endblock %}

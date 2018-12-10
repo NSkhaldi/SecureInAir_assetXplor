@@ -1,46 +1,38 @@
+!web/assets/tmp/upload_map.png
 
-
-# Email spool folder
-/app/spool/*
-
-# Cache, session files and logs (Symfony3)
-/var/cache/*
-/var/logs/*
-/var/sessions/*
-!var/cache/.gitkeep
-!var/logs/.gitkeep
-!var/sessions/.gitkeep
-
-# Parameters
 /app/config/parameters.yml
-/app/config/parameters.ini
 
-
-# Managed by Composer
-/app/bootstrap.php.cache
-/var/bootstrap.php.cache
-/bin/*
-!bin/console
-!bin/symfony_requirements
-/vendor/
-
-# Assets and user uploads
-/web/*
-
-
-
-# PHPUnit
-/app/phpunit.xml
-/phpunit.xml
-
-# Build data
 /build/
 
-# Composer PHAR
-/composer.phar
+/phpunit.xml
 
-# Backup entities generated with doctrine:generate:entities command
-**/Entity/*~
+/tests/
 
-# Embedded web-server pid file
-/.web-server-pi
+var/*
+!var/cache
+var/cache/
+var/cache/.gitkeep
+!var/logs
+var/logs/
+!var/logs/.gitkeep
+!var/sessions
+var/sessions/
+!var/sessions/.gitkeep
+!var/SymfonyRequirements.php
+
+
+/vendor/
+
+
+web/*
+!web/app_dev.php
+!web/app.php
+!web/config.php
+!web/.htaccess
+!web/assets/tmp/pdf.jpg
+!web/assets/tmp/netherland.jpg
+!web/assets/tmp/dutch_map.jpg
+!web/assets/tmp/upload_map.png
+!web/assets/tmp/favicon.ico
+
+

@@ -8,6 +8,8 @@
         <a href="" class="sidebar-menu-item on " alt="level1">Level 2 <span class="badge">{{ asset_number }}</span></a>
         <a href="#" class="sidebar-menu-item " alt="level2">Level 3  </a>
         <a href="#" class="sidebar-menu-item" alt="Object">Level 4 </a>
+        <a href="#" class="sidebar-menu-item" alt="Room">Level 5</a>
+        <a href="#" class="sidebar-menu-item" alt="Object">Level 6</a>
       </div>
     {% endblock %}
 
@@ -86,7 +88,7 @@
          data-image="{{ asset(level2.getImgPath) }}"
          data-name="{{ level2.getLevel2Name }}"
          data-remove="{{ path('see_it_allasset_xplor_remove_level2', {'level0_id': level0_id, 'level1_id': level1.getId , 'level2_id': level2.getId }) }}"
-         data-pdf="{{ path('see_it_allasset_xplor_level2_docs',  {'level0_id': level0_id ,'level1_id': level1.getId , 'level2_id': level2.getId }) }}" 
+         data-pdf="{{ path('see_it_allasset_xplor_level2_docs',  {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2.getId }) }}" 
          data-pin="{{  level2.getDataLoc }}"
          data-image-id="{{ level2.getId }}">
 

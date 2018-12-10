@@ -23,7 +23,7 @@ class Level0Type extends AbstractType
                  ->add('note',      TextType::class)
                  ->add('id_asset',      TextType::class)
                  ->add('contract_number',      TextType::class)
-                 ->add('display',    CheckboxType::class, array( 'required' => false))
+                 ->add('display',    CheckboxType::class, array( 'required' => true))
                  ->add('save',      SubmitType::class);
                  
                 

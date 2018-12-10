@@ -1,0 +1,122 @@
+       {% extends "::assetXplor.html.twig" %}
+
+
+ {% block levels %}
+      <div class="sidebar-menu">
+ <a href="{{ path('see_it_allasset_xplor_level5' , {'level0_id': level0_id , 'level1_id': level1_id, 'level2_id': level2_id, 'level3_id': level3_id, 'level4_id': level4.getId   }) }}" class="sidebar-menu-item " alt="Location">Back to levels</a>
+ <a href="#" class="sidebar-menu-item on " alt="Building">Documents </a>
+      </div>
+    {% endblock %}
+
+          
+
+        
+
+{% block body %}
+ <div class="body">
+
+      <div class="body-header">
+        <form class="body-header-name" method="GET" action="/app.html">
+
+        </form>
+        <button id="button-add-images" type="button" aria-label="Add Images" class="button body-header-add-images"> document</button>
+        <button class="button body-header-camera" type="button" id="button-camera" aria-label="Scan QR"></button>
+      </div>
+
+      <div class="body-notes">{{level5.getNote}}</div>
+
+
+      <div class="body-url">
+        <input readonly type="text" id="body-url" value="{{ app.request.uri }}" />
+        <button type="button" class="button body-url-copy" id="button-copy-url" aria-label="Copy URL" data-clipboard-target="#body-url">Copy URL</button>
+        <button type="button" class="button body-url-qr" id="button-qr" aria-label="Get QR-code" data-target="#body-url">Get QR-code</button>
+      </div>
+
+     
+              <div class="image-map-container">
+        <div id="main-image" class="main-image" data-pdf="http://www.assetxplor.nl/app/Symfony/web/">
+                  <div class="main-image-inner">
+            <img src="{{ asset( level5.getThumbPath ) }}" />
+            <button type="button" class="main-image-button more" aria-label="More"></button>
+          </div>
+        </div>
+       
+      </div>
+
+
+      
+
+      <!-- Body > Frame Images -->
+      <div class="body-image-list" id="image-list">
+
+         {% for doc in docs %}
+
+        <div class="image-item" 
+         data-image='assets/tmp/PDF.JPG'
+         data-name="{{ asset('assets/tmp/pdf.jpg') }}"
+         data-remove="{{ path('see_it_allasset_xplor_remove_level5_docs', {'document_id': doc.getId,'level0_id': level0_id, 'level1_id': level1_id , 'level2_id': level2_id,'level3_id': level3_id, 'level4_id': level4.getId, 'level5_id': level5.getId }) }}"
+         data-pdf="{{ path('see_it_allasset_xplor_level5_docs', {'level0_id': level0_id ,'level1_id': level1_id , 'level2_id': level2_id,'level3_id': level3_id ,'level4_id': level4.getId,'level5_id': level5.getId}) }}" >
+          <div class="image-item-image">
+
+            <img src="{{asset('assets/tmp/pdf.jpg') }}" alt="Building 1" />
+            <a href="{{asset(doc.getPath)}}" target="_blank" class="image-item-button enter" title="Open the pdf"></a>
+            <button type="button" class="image-item-button more" aria-label="More"></button>
+
+          </div>
+
+          <div class="image-item-label">
+            {{ doc.getpdfName }}
+            <span class="badge location">1</span>
+            <span class="badge level1">{{ level5.getIdasset}}</span> 
+          </div>
+        </div>
+          {% endfor %}
+    </div>
+    <!--- End of the body -->
+    {% endblock %}
+
+
+    {% block image %}
+        {% if (is_granted("ROLE_ADMIN") or is_granted("ROLE_EDITOR")) %}
+        <!-- Add images popup -->
+          <div class="modal" class="add-image-modal" id="add-image-modal">
+         {{ form_start(form_saveDoc, {'attr' : {'class' :'modal-body'}}) }}
+          <h1>Add Document</h1>
+          {{ form_widget(form_saveDoc.file) }} 
+          <label for="add-images-input-note">Note
+            {{ form_widget(form_saveDoc.note, { 'attr': {'placeholder': 'Enter note', 'maxlength': '50', 'name': 'note', 'id' : 'add-image-input-note', 'value' : '-' } }) }}
+          </label>
+          <div class="button-group">
+            <button type="button" id="add-images-cancel" class="button">Cancel</button>
+        {{ form_widget(form_saveDoc.save,  { 'attr': {'class' : 'button-blue'} })  }}
+        {{ form_end(form_saveDoc) }}
+          </div>
+        
+      </div>
+      {% endif %}
+    {% endblock %}
+
+
+
+
+  {% block saveimage %}
+  {% endblock %}  
+
+
+
+       {% block PinEeditor %} 
+    <div class="modal pin-editor" id="pin-editor">
+      <form id="pin-editor-form" class="modal-body pin-editor-body" method="GET" action="{{ app.request.baseurl }}/loc/">
+        <h1 id="pin-editor-header">Pin Editor</h1>
+        <input type="hidden" id="pin-editor-input" name="pin-data" value="" />
+        <div class="pin-editor-container" id="pin-editor-container">
+          <div class="map-pin" id="pin-editor-pin"></div>
+          <img class="pin-editor-image" src="{{asset('assets/tmp/dutch_map.jpg') }}" />
+        </div>
+        <div class="button-group">
+          <button type="button" id="pin-editor-cancel" class="button">Cancel</button>
+          <button type="submit" class="button-blue">Save</button>
+        </div>
+      </form>
+    </div>
+    {% endblock %}

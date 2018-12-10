@@ -1,0 +1,4 @@
+RewriteEngine on
+
+RewriteCond %{HTTP_HOST} ^(www\.)?client16.assetxplor\.nl$ [NC]
+RewriteRule !^client16/web /client16/web%{REQUEST_URI} [L,NC]

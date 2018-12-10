@@ -41,7 +41,26 @@ see_it_allasset_xplor_level4:
         level3_id:    \d+
         item_id:      \d+ 
   
- 
+see_it_allasset_xplor_level5:
+    path:      /levels/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}        
+    defaults: { _controller: SeeItAllassetXploreBundle:App:level5 }
+    requirements: 
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        item_id:      \d+ 
+
+see_it_allasset_xplor_level6:
+    path:      /levels/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}         
+    defaults: { _controller: SeeItAllassetXploreBundle:App:level6 }
+    requirements: 
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        item_id:      \d+ 
 
 
 
@@ -88,6 +107,30 @@ see_it_allasset_xplor_remove_level4:
         level3_id:    \d+
         level4_id:    \d+
 
+see_it_allasset_xplor_remove_level5:
+    path:     /remove/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel5}    
+    requirements:
+        level0_id:    \d+ 
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+
+see_it_allasset_xplor_remove_level6:
+    path:     /remove/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}/{level6_id}       
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel6}    
+    requirements:
+        level0_id:    \d+ 
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        level6_id:    \d+
+        
+
 
 
 
@@ -133,6 +176,29 @@ see_it_allasset_xplor_level4_docs:
         level2_id:    \d+
         level3_id:    \d+
         level4_id:    \d+
+
+see_it_allasset_xplor_level5_docs:
+    path:     /docs/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}        
+    defaults: { _controller: SeeItAllassetXploreBundle:App:doclevel5 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+
+see_it_allasset_xplor_level6_docs:
+    path:     /docs/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}/{level6_id}          
+    defaults: { _controller: SeeItAllassetXploreBundle:App:doclevel6 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        level6_id:    \d+
         
 
  #REMOVE DOCS ROUTES
@@ -184,6 +250,31 @@ see_it_allasset_xplor_remove_level4_docs:
         level3_id:    \d+
         level4_id:    \d+
 
+see_it_allasset_xplor_remove_level5_docs:
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel5Doc}    
+    requirements: 
+        document_id:   \d+
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+
+see_it_allasset_xplor_remove_level6_docs:
+    path:     /remove/docs/{document_id}/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}/{level6_id}        
+    defaults: { _controller: SeeItAllassetXploreBundle:App:Removelevel6Doc}    
+    requirements: 
+        document_id:   \d+
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        level6_id:    \d+
+
 
 
 
@@ -231,9 +322,28 @@ see_it_allasset_xplor_level4_url:
         level3_id:    \d+
         level4_id:    \d+
 
+see_it_allasset_xplor_level5_url:
+    path:      /url/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}     
+    defaults: { _controller: SeeItAllassetXploreBundle:App:urllevel5 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
 
-
-
+see_it_allasset_xplor_level6_url:
+    path:      /url/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}/{level6_id}      
+    defaults: { _controller: SeeItAllassetXploreBundle:App:urllevel6 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        level6_id:    \d+
 
 
 
@@ -284,7 +394,26 @@ see_it_allasset_xplor_level4_loc:
         level3_id:    \d+
         level4_id:    \d+
 
+see_it_allasset_xplor_level5_loc:
+    path:      /loc/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}       
+    defaults: { _controller: SeeItAllassetXploreBundle:App:loclevel5 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
 
-
+see_it_allasset_xplor_level6_loc:
+    path:      /loc/{level0_id}/{level1_id}/{level2_id}/{level3_id}/{level4_id}/{level5_id}/{level6_id}       
+    defaults: { _controller: SeeItAllassetXploreBundle:App:loclevel6 } 
+    requirements: 
+        level0_id:    \d+
+        level1_id:    \d+
+        level2_id:    \d+
+        level3_id:    \d+
+        level4_id:    \d+
+        level5_id:    \d+
+        level6_id:    \d+
 
 

@@ -159,7 +159,7 @@
         <div class="add-image-modal-radios">		      
 	          <label class="radio" for="add-image-radio-image">		
 	
-              {% block display %}  {{ form_widget(form.display,  { 'attr': { 'name' : 'image-type' } }) }} {% endblock %}
+              {% block display %}  {{ form_widget(form.display,  { 'attr': { 'name' : 'image-type', 'checked': 'checked' } }) }} {% endblock %}
                 Display the Image		
 	            <div class="radio-mark"></div>		
 	          </label>		

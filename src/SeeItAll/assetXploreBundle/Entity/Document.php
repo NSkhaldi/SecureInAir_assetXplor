@@ -51,6 +51,19 @@ private $level3;
 //@ORM\JoinColumn(nullable=false) prohibits the creation of pdfss without a room 
 private $level4;
  
+ /**
+   * @ORM\ManyToOne(targetEntity="SeeItAll\assetXploreBundle\Entity\Level5")
+   * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")  
+   */
+//@ORM\JoinColumn(nullable=false) prohibits the creation of pdfss without a room 
+private $level5;
+
+ /**
+   * @ORM\ManyToOne(targetEntity="SeeItAll\assetXploreBundle\Entity\Level6")
+   * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")  
+   */
+//@ORM\JoinColumn(nullable=false) prohibits the creation of pdfss without a room 
+private $level6;
 
 
 
@@ -455,5 +468,53 @@ private $level4;
     public function getLevel4()
     {
         return $this->level4;
+    }
+
+    /**
+     * Set level5.
+     *
+     * @param \SeeItAll\assetXploreBundle\Entity\Level5|null $level5
+     *
+     * @return Document
+     */
+    public function setLevel5(\SeeItAll\assetXploreBundle\Entity\Level5 $level5 = null)
+    {
+        $this->level5 = $level5;
+
+        return $this;
+    }
+
+    /**
+     * Get level5.
+     *
+     * @return \SeeItAll\assetXploreBundle\Entity\Level5|null
+     */
+    public function getLevel5()
+    {
+        return $this->level5;
+    }
+
+    /**
+     * Set level6.
+     *
+     * @param \SeeItAll\assetXploreBundle\Entity\Level6|null $level6
+     *
+     * @return Document
+     */
+    public function setLevel6(\SeeItAll\assetXploreBundle\Entity\Level6 $level6 = null)
+    {
+        $this->level6 = $level6;
+
+        return $this;
+    }
+
+    /**
+     * Get level6.
+     *
+     * @return \SeeItAll\assetXploreBundle\Entity\Level6|null
+     */
+    public function getLevel6()
+    {
+        return $this->level6;
     }
 }
